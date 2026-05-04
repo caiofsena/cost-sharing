@@ -26,6 +26,11 @@ const button = tv({
         label: "text-danger-light",
         icon: "bg-danger-light",
       },
+      text: {
+        base: "border-transparent bg-transparent",
+        label: "text-green-base",
+        icon: "bg-green-base",
+      },
     },
     size: {
       md: {
@@ -59,6 +64,7 @@ export function Button({
 }: ButtonProps) {
   const styles = button({ intent, size });
   const iconColor = styles.icon();
+  const isTextOnly = intent === "text";
 
   return (
     <Pressable
@@ -69,9 +75,9 @@ export function Button({
       disabled={disabled}
       {...props}
     >
-      <PlusIcon className={iconColor} />
-      {size !== "icon" ? <Text className={styles.label()}>{label}</Text> : null}
-      {size !== "icon" ? <PlusIcon className={iconColor} /> : null}
+      {!isTextOnly && <PlusIcon className={iconColor} />}
+      <Text className={styles.label()}>{label}</Text>
+      {!isTextOnly && size !== "icon" && <PlusIcon className={iconColor} />}
     </Pressable>
   );
 }

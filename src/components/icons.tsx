@@ -66,3 +66,33 @@ export function CoinIcon({ className = "border-gray-400 text-gray-400" }: IconPr
     </View>
   );
 }
+
+export function MailIcon({ className = "bg-gray-400" }: IconProps) {
+  return (
+    <View className="h-5 w-5 items-center justify-center">
+      <View className={`h-3.5 w-5 rounded-sm border ${className}`}>
+        <View className={`absolute left-0 top-0 h-0.5 w-2.5 rotate-45 origin-top-left ${className}`} />
+        <View className={`absolute right-0 top-0 h-0.5 w-2.5 -rotate-45 origin-top-right ${className}`} />
+      </View>
+    </View>
+  );
+}
+
+export function LockIcon({ className = "bg-gray-400" }: IconProps) {
+  return (
+    <View className="h-5 w-5 items-center justify-center">
+      <View className={`absolute -top-1 h-2 w-3 rounded-t-full border-b-0 border-l border-r ${className}`} />
+      <View className={`h-3 w-4 rounded-sm border ${className}`} />
+      <View className={`absolute h-0.5 w-0.5 rounded-full ${className}`} />
+    </View>
+  );
+}
+
+export function UserIcon({ className = "border-gray-400" }: IconProps) {
+  return (
+    <View className="h-5 w-5 items-center justify-center">
+      <View className={`absolute top-0 h-2 w-2 rounded-full border-2 ${className}`} />
+      <View className={`absolute bottom-0 h-2.5 w-4 rounded-t-full border-2 ${className}`} />
+    </View>
+  );
+}
