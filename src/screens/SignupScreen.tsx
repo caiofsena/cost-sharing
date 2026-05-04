@@ -10,8 +10,11 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { Divider, InputWithIcon, Logo, MailIcon, LockIcon, UserIcon } from "../components";
+import { Divider, InputIcon } from "../components";
 import { authService } from "../services";
+import Logo from "../../assets/logo.svg";
+import MCI from '@expo/vector-icons/MaterialCommunityIcons';
+import { cssInterop } from 'nativewind';
 
 type SignupScreenProps = {
   onNavigateToLogin: () => void;
@@ -25,6 +28,12 @@ export default function SignupScreen({ onNavigateToLogin, onSignupSuccess }: Sig
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  cssInterop(MCI, {
+    className: {
+      target: "style"
+    }
+  });
 
   async function handleSignup() {
     setError("");
@@ -70,14 +79,18 @@ export default function SignupScreen({ onNavigateToLogin, onSignupSuccess }: Sig
           contentContainerClassName="flex-1"
           keyboardShouldPersistTaps="handled"
         >
-          <View className="flex-1 justify-center px-6">
-            <View className="mb-8 items-center">
-              <Logo size="lg" />
+          <View className="flex-1 justify-center">
+            <View className="h-80 justify-center items-center">
+              <Logo width={64} height={64} />
+              <View className="flex-row mt-2">
+                <Text className={'font-heading-lg text-green-base'}>TaskCost</Text>
+                <Text className={'font-heading-sm text-green-light'}> Split</Text>
+              </View>
             </View>
 
-            <View className="rounded-t-3xl bg-gray-700 px-6 pt-8 pb-10">
+            <View className="flex-1 rounded-t-3xl bg-gray-700 px-6 pt-8 pb-1">
               <Text className="mb-8 text-center font-heading-lg text-heading-lg text-gray-100">
-                Criar conta
+                Crie sua conta
               </Text>
 
               {error ? (
@@ -89,15 +102,15 @@ export default function SignupScreen({ onNavigateToLogin, onSignupSuccess }: Sig
               ) : null}
 
               <View className="gap-4">
-                <InputWithIcon
-                  leftIcon={<UserIcon className="border-gray-400" />}
+                <InputIcon
+                  leftIcon={<MCI name="account-circle-outline" size={20} className="color-gray-200" />}
                   placeholder="Nome completo"
                   value={name}
                   onChangeText={setName}
                 />
 
-                <InputWithIcon
-                  leftIcon={<MailIcon className="bg-gray-400" />}
+                <InputIcon
+                  leftIcon={<MCI name="email-outline" size={20} className="color-gray-200" />}
                   placeholder="E-mail"
                   keyboardType="email-address"
                   autoCapitalize="none"
@@ -105,20 +118,12 @@ export default function SignupScreen({ onNavigateToLogin, onSignupSuccess }: Sig
                   onChangeText={setEmail}
                 />
 
-                <InputWithIcon
-                  leftIcon={<LockIcon className="bg-gray-400" />}
+                <InputIcon
+                  leftIcon={<MCI name="asterisk" size={20} className="color-gray-200" />}
                   placeholder="Senha"
                   secureTextEntry
                   value={password}
                   onChangeText={setPassword}
-                />
-
-                <InputWithIcon
-                  leftIcon={<LockIcon className="bg-gray-400" />}
-                  placeholder="Confirmar senha"
-                  secureTextEntry
-                  value={confirmPassword}
-                  onChangeText={setConfirmPassword}
                 />
               </View>
 
@@ -131,7 +136,7 @@ export default function SignupScreen({ onNavigateToLogin, onSignupSuccess }: Sig
                   <ActivityIndicator color="#0B0B0E" />
                 ) : (
                   <Text className="font-label-md text-label-md text-gray-800">
-                    Criar conta
+                    Cadastrar
                   </Text>
                 )}
               </Pressable>
@@ -140,13 +145,16 @@ export default function SignupScreen({ onNavigateToLogin, onSignupSuccess }: Sig
                 <Divider />
               </View>
 
-              <View className="mt-6 flex-row items-center justify-center gap-1">
-                <Text className="font-text-sm text-text-sm text-gray-300">
-                  Já tem uma conta?
+              <View className='flex-1 justify-end'>
+                <Text className="pt-8 self-center font-text-sm text-text-sm text-gray-200">
+                  Já tem cadastro?
                 </Text>
-                <Pressable onPress={onNavigateToLogin}>
-                  <Text className="font-label-sm text-label-sm text-green-base">
-                    Entrar
+                <Pressable
+                  className="mt-6 h-12 items-center justify-center rounded-full bg-gray-600 border border-gray-500 active:opacity-80"
+                  onPress={onNavigateToLogin}
+                >
+                  <Text className="font-label-md text-label-md text-gray-200">
+                    Entrar na conta
                   </Text>
                 </Pressable>
               </View>
@@ -157,3 +165,4 @@ export default function SignupScreen({ onNavigateToLogin, onSignupSuccess }: Sig
     </SafeAreaView>
   );
 }
+// onNavigateToLogin

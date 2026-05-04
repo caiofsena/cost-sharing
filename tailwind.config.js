@@ -34,7 +34,8 @@ module.exports = {
         },
       },
       fontFamily: {
-        'heading': ['Sora_700Bold', 'sans-serif'],
+        'heading-lg': ['Sora_700Bold', 'sans-serif'],
+        'heading-sm': ['Sora_400Regular', 'sans-serif'],
         'body': ['Inter_400Regular', 'sans-serif'],
         'label-lg': ['Inter_600SemiBold', 'sans-serif'],
         'label-md': ['Inter_600SemiBold', 'sans-serif'],

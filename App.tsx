@@ -6,7 +6,7 @@ import {
   Inter_400Regular,
   Inter_600SemiBold,
 } from "@expo-google-fonts/inter";
-import { Sora_700Bold } from "@expo-google-fonts/sora";
+import { Sora_700Bold, Sora_400Regular } from "@expo-google-fonts/sora";
 
 import AppNavigator from "./src/navigation/AppNavigator";
 import { ActivityIndicator, View } from "react-native";
@@ -16,6 +16,7 @@ export default function App() {
     Inter_400Regular,
     Inter_600SemiBold,
     Sora_700Bold,
+    Sora_400Regular,
   });
 
   if (!fontsLoaded) {

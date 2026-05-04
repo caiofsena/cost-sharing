@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { Text, TextInput, View, type TextInputProps } from "react-native";
+import { TextInput, View, type TextInputProps } from "react-native";
 import { tv } from "tailwind-variants";
 
-const inputWithIcon = tv({
+const inputIcon = tv({
   slots: {
     container: "flex-row items-center rounded-md border border-gray-500 bg-gray-800",
     iconWrapper: "pl-4",
-    field: "flex-1 h-12 pr-4 font-text-md text-text-md text-gray-100",
+    field: "flex-1 h-12 pr-4 ml-3 font-text-md text-text-md text-gray-100",
   },
   variants: {
     focused: {
@@ -18,13 +18,13 @@ const inputWithIcon = tv({
   },
 });
 
-type InputWithIconProps = TextInputProps & {
+type InputIconProps = TextInputProps & {
   leftIcon: React.ReactNode;
 };
 
-export function InputWithIcon({ leftIcon, className, ...props }: InputWithIconProps) {
+export function InputIcon({ leftIcon, className, ...props }: InputIconProps) {
   const [focused, setFocused] = useState(false);
-  const styles = inputWithIcon({ focused });
+  const styles = inputIcon({ focused });
 
   return (
     <View className={styles.container({ className })}>

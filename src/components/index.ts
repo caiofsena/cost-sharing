@@ -4,7 +4,6 @@ export * from "./Button";
 export * from "./Card";
 export * from "./Divider";
 export * from "./Input";
-export * from "./InputWithIcon";
-export * from "./Logo";
+export * from "./InputIcon";
 export * from "./StatusSelect";
 export * from "./icons";

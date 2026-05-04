@@ -9,9 +9,12 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { cssInterop } from "nativewind";
 
-import { Divider, InputWithIcon, Logo, MailIcon, LockIcon } from "../components";
+import { Divider, InputIcon } from "../components";
 import { authService } from "../services";
+import Logo from "../../assets/logo.svg";
+import MCI from '@expo/vector-icons/MaterialCommunityIcons';
 
 type LoginScreenProps = {
   onNavigateToSignup: () => void;
@@ -23,6 +26,12 @@ export default function LoginScreen({ onNavigateToSignup, onLoginSuccess }: Logi
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  cssInterop(MCI, {
+    className: {
+      target: "style"
+    }
+  });
 
   async function handleLogin() {
     setError("");
@@ -54,12 +63,16 @@ export default function LoginScreen({ onNavigateToSignup, onLoginSuccess }: Logi
           contentContainerClassName="flex-1"
           keyboardShouldPersistTaps="handled"
         >
-          <View className="flex-1 justify-center px-6">
-            <View className="mb-10 items-center">
-              <Logo size="lg" />
+          <View className="flex-1 justify-center">
+            <View className="h-96 justify-center items-center">
+              <Logo width={64} height={64} />
+              <View className="flex-row mt-2">
+                <Text className={'font-heading-lg text-green-base'}>TaskCost</Text>
+                <Text className={'font-heading-sm text-green-light'}> Split</Text>
+              </View>
             </View>
 
-            <View className="rounded-t-3xl bg-gray-700 px-6 pt-8 pb-10">
+            <View className="flex-1 rounded-t-3xl bg-gray-700 px-6 pt-8 pb-1">
               <Text className="mb-8 text-center font-heading-lg text-heading-lg text-gray-100">
                 Entre no app
               </Text>
@@ -73,8 +86,8 @@ export default function LoginScreen({ onNavigateToSignup, onLoginSuccess }: Logi
               ) : null}
 
               <View className="gap-4">
-                <InputWithIcon
-                  leftIcon={<MailIcon className="bg-gray-400" />}
+                <InputIcon
+                  leftIcon={<MCI name="email-outline" size={20} className="color-gray-200" />}
                   placeholder="E-mail"
                   keyboardType="email-address"
                   autoCapitalize="none"
@@ -82,8 +95,8 @@ export default function LoginScreen({ onNavigateToSignup, onLoginSuccess }: Logi
                   onChangeText={setEmail}
                 />
 
-                <InputWithIcon
-                  leftIcon={<LockIcon className="bg-gray-400" />}
+                <InputIcon
+                  leftIcon={<MCI name="asterisk" size={20} className="color-gray-200" />}
                   placeholder="Senha"
                   secureTextEntry
                   value={password}
@@ -92,7 +105,7 @@ export default function LoginScreen({ onNavigateToSignup, onLoginSuccess }: Logi
               </View>
 
               <Pressable
-                className="mt-6 h-12 items-center justify-center rounded-full bg-green-base active:opacity-80"
+                className="mt-6 h-12 items-center justify-center rounded-full bg-green-base border border-green-light active:opacity-80"
                 onPress={handleLogin}
                 disabled={loading}
               >
@@ -109,12 +122,15 @@ export default function LoginScreen({ onNavigateToSignup, onLoginSuccess }: Logi
                 <Divider />
               </View>
 
-              <View className="mt-6 flex-row items-center justify-center gap-1">
-                <Text className="font-text-sm text-text-sm text-gray-300">
+              <View className='flex-1 justify-end'>
+                <Text className="self-center font-text-sm text-text-sm text-gray-200">
                   Ainda não tem cadastro?
                 </Text>
-                <Pressable onPress={onNavigateToSignup}>
-                  <Text className="font-label-sm text-label-sm text-green-base">
+                <Pressable
+                  className="mt-6 h-12 items-center justify-center rounded-full bg-gray-600 border border-gray-500 active:opacity-80"
+                  onPress={onNavigateToSignup}
+                >
+                  <Text className="font-label-md text-label-md text-gray-200">
                     Criar conta
                   </Text>
                 </Pressable>
