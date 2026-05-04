@@ -3,12 +3,14 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { Text } from "react-native";
 
+import ComponentsScreen from "../screens/ComponentsScreen";
 import ExpensesScreen from "../screens/ExpensesScreen";
 import HomeScreen from "../screens/HomeScreen";
 import SettingsScreen from "../screens/SettingsScreen";
 
 type TabParamList = {
   Home: undefined;
+  Components: undefined;
   Expenses: undefined;
   Settings: undefined;
 };
@@ -36,6 +38,16 @@ function HomeTabs() {
           tabBarLabel: "Home",
           tabBarIcon: ({ color }: { color: string }) => (
             <Text style={{ color, fontSize: 20 }}>🏠</Text>
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Components"
+        component={ComponentsScreen}
+        options={{
+          tabBarLabel: "Components",
+          tabBarIcon: ({ color }: { color: string }) => (
+            <Text style={{ color, fontSize: 20 }}>🧩</Text>
           ),
         }}
       />
