@@ -1,9 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Text } from "react-native";
+
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { checkStoredAuth } from "../store/authSlice";
 
 import LoginScreen from "../screens/LoginScreen";
 import SignupScreen from "../screens/SignupScreen";
@@ -36,27 +38,9 @@ const RootStack = createNativeStackNavigator<RootStackParamList>();
 function AuthNavigator() {
   return (
     <AuthStack.Navigator screenOptions={{ headerShown: false }}>
-      <AuthStack.Screen name="Login" component={LoginScreenWrapper} />
-      <AuthStack.Screen name="Signup" component={SignupScreenWrapper} />
+      <AuthStack.Screen name="Login" component={LoginScreen} />
+      <AuthStack.Screen name="Signup" component={SignupScreen} />
     </AuthStack.Navigator>
-  );
-}
-
-function LoginScreenWrapper({ navigation }: any) {
-  return (
-    <LoginScreen
-      onNavigateToSignup={() => navigation.navigate("Signup")}
-      onLoginSuccess={() => navigation.getParent()?.replace("Main")}
-    />
-  );
-}
-
-function SignupScreenWrapper({ navigation }: any) {
-  return (
-    <SignupScreen
-      onNavigateToLogin={() => navigation.navigate("Login")}
-      onSignupSuccess={() => navigation.getParent()?.replace("Main")}
-    />
   );
 }
 
@@ -118,27 +102,18 @@ function HomeTabs() {
 }
 
 export default function AppNavigator() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const dispatch = useAppDispatch();
+  const { token, loading } = useAppSelector((state) => state.auth);
 
   useEffect(() => {
-    checkAuth();
-  }, []);
-
-  async function checkAuth() {
-    try {
-      const token = await AsyncStorage.getItem("auth_token");
-      setIsAuthenticated(!!token);
-    } catch {
-      setIsAuthenticated(false);
-    } finally {
-      setLoading(false);
-    }
-  }
+    dispatch(checkStoredAuth());
+  }, [dispatch]);
 
   if (loading) {
     return null;
   }
+
+  const isAuthenticated = !!token;
 
   return (
     <NavigationContainer>

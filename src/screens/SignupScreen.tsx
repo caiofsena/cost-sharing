@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -9,64 +9,72 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { cssInterop } from "nativewind";
 
+import { useNavigation } from "@react-navigation/native";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { signUp, clearError } from "../store/authSlice";
 import { Divider, InputIcon } from "../components";
-import { authService } from "../services";
 import Logo from "../../assets/logo.svg";
-import MCI from '@expo/vector-icons/MaterialCommunityIcons';
-import { cssInterop } from 'nativewind';
+import MCI from "@expo/vector-icons/MaterialCommunityIcons";
 
-type SignupScreenProps = {
-  onNavigateToLogin: () => void;
-  onSignupSuccess: () => void;
+type AuthStackParamList = {
+  Login: undefined;
+  Signup: undefined;
 };
 
-export default function SignupScreen({ onNavigateToLogin, onSignupSuccess }: SignupScreenProps) {
+export default function SignupScreen() {
+  const navigation =
+    useNavigation<NativeStackNavigationProp<AuthStackParamList>>();
+  const dispatch = useAppDispatch();
+  const { loading, error } = useAppSelector((state) => state.auth);
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [localError, setLocalError] = useState("");
 
   cssInterop(MCI, {
     className: {
-      target: "style"
-    }
+      target: "style",
+    },
   });
 
-  async function handleSignup() {
-    setError("");
+  useEffect(() => {
+    if (error) {
+      setLocalError(error);
+    }
+  }, [error]);
+
+  function handleSignup() {
+    setLocalError("");
+    dispatch(clearError());
 
     if (!name.trim() || !email.trim() || !password || !confirmPassword) {
-      setError("Preencha todos os campos");
+      setLocalError("Preencha todos os campos");
       return;
     }
 
     if (password !== confirmPassword) {
-      setError("As senhas não coincidem");
+      setLocalError("As senhas não coincidem");
       return;
     }
 
     if (password.length < 6) {
-      setError("A senha deve ter pelo menos 6 caracteres");
+      setLocalError("A senha deve ter pelo menos 6 caracteres");
       return;
     }
 
-    setLoading(true);
-
-    try {
-      await authService.signUp({
+    dispatch(
+      signUp({
         name: name.trim(),
         email: email.trim(),
         password,
-      });
-      onSignupSuccess();
-    } catch (err: any) {
-      setError(err?.response?.data?.message || "Erro ao criar conta");
-    } finally {
-      setLoading(false);
-    }
+      })
+    );
   }
 
   return (
@@ -83,8 +91,8 @@ export default function SignupScreen({ onNavigateToLogin, onSignupSuccess }: Sig
             <View className="h-80 justify-center items-center">
               <Logo width={64} height={64} />
               <View className="flex-row mt-2">
-                <Text className={'font-heading-lg text-green-base'}>TaskCost</Text>
-                <Text className={'font-heading-sm text-green-light'}> Split</Text>
+                <Text className="font-heading-lg text-green-base">TaskCost</Text>
+                <Text className="font-heading-sm text-green-light"> Split</Text>
               </View>
             </View>
 
@@ -93,24 +101,32 @@ export default function SignupScreen({ onNavigateToLogin, onSignupSuccess }: Sig
                 Crie sua conta
               </Text>
 
-              {error ? (
+              {localError ? (
                 <View className="mb-4 rounded-md bg-danger-low p-3">
                   <Text className="text-center font-text-sm text-text-sm text-danger-light">
-                    {error}
+                    {localError}
                   </Text>
                 </View>
               ) : null}
 
               <View className="gap-4">
                 <InputIcon
-                  leftIcon={<MCI name="account-circle-outline" size={20} className="color-gray-200" />}
+                  leftIcon={
+                    <MCI
+                      name="account-circle-outline"
+                      size={20}
+                      className="color-gray-200"
+                    />
+                  }
                   placeholder="Nome completo"
                   value={name}
                   onChangeText={setName}
                 />
 
                 <InputIcon
-                  leftIcon={<MCI name="email-outline" size={20} className="color-gray-200" />}
+                  leftIcon={
+                    <MCI name="email-outline" size={20} className="color-gray-200" />
+                  }
                   placeholder="E-mail"
                   keyboardType="email-address"
                   autoCapitalize="none"
@@ -119,16 +135,28 @@ export default function SignupScreen({ onNavigateToLogin, onSignupSuccess }: Sig
                 />
 
                 <InputIcon
-                  leftIcon={<MCI name="asterisk" size={20} className="color-gray-200" />}
+                  leftIcon={
+                    <MCI name="asterisk" size={20} className="color-gray-200" />
+                  }
                   placeholder="Senha"
                   secureTextEntry
                   value={password}
                   onChangeText={setPassword}
                 />
+
+                <InputIcon
+                  leftIcon={
+                    <MCI name="asterisk" size={20} className="color-gray-200" />
+                  }
+                  placeholder="Confirmar senha"
+                  secureTextEntry
+                  value={confirmPassword}
+                  onChangeText={setConfirmPassword}
+                />
               </View>
 
               <Pressable
-                className="mt-6 h-12 items-center justify-center rounded-full bg-green-base active:opacity-80"
+                className="mt-6 h-12 items-center justify-center rounded-full bg-green-base border border-green-light active:opacity-80"
                 onPress={handleSignup}
                 disabled={loading}
               >
@@ -145,13 +173,13 @@ export default function SignupScreen({ onNavigateToLogin, onSignupSuccess }: Sig
                 <Divider />
               </View>
 
-              <View className='flex-1 justify-end'>
+              <View className="flex-1 justify-end">
                 <Text className="pt-8 self-center font-text-sm text-text-sm text-gray-200">
                   Já tem cadastro?
                 </Text>
                 <Pressable
                   className="mt-6 h-12 items-center justify-center rounded-full bg-gray-600 border border-gray-500 active:opacity-80"
-                  onPress={onNavigateToLogin}
+                  onPress={() => navigation.navigate("Login")}
                 >
                   <Text className="font-label-md text-label-md text-gray-200">
                     Entrar na conta
@@ -165,4 +193,3 @@ export default function SignupScreen({ onNavigateToLogin, onSignupSuccess }: Sig
     </SafeAreaView>
   );
 }
-// onNavigateToLogin
