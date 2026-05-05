@@ -9,12 +9,22 @@ import {
   ExpenseCard,
   Input,
   ParticipantCard,
+  Select,
   StatusSelect,
+  type SelectOption,
 } from "../components";
 
 export default function ComponentsScreen() {
   const [tab, setTab] = useState<"activities" | "summary" | "participants">("activities");
   const [status, setStatus] = useState<"pending" | "paid">("pending");
+  const [selectedUsers, setSelectedUsers] = useState<SelectOption[]>([]);
+
+  const sampleOptions: SelectOption[] = [
+    { id: "1", name: "Jonas Santos", initials: "JS" },
+    { id: "2", name: "Maria Oliveira", initials: "MO" },
+    { id: "3", name: "Rafael Almeida", initials: "RA" },
+    { id: "4", name: "Lucas Mendes", initials: "LM" },
+  ];
 
   return (
     <ScrollView className="flex-1 bg-gray-800" contentContainerClassName="gap-8 px-6 py-10">
@@ -81,6 +91,17 @@ export default function ComponentsScreen() {
               { id: "3", initials: "UN", name: "User Name" },
               { id: "4", initials: "UN", name: "User Name" },
             ]}
+          />
+        </View>
+      </Section>
+
+      <Section title="Select">
+        <View className="gap-5">
+          <Select
+            options={sampleOptions}
+            value={selectedUsers}
+            onChange={setSelectedUsers}
+            placeholder="Selecionar usuários"
           />
         </View>
       </Section>

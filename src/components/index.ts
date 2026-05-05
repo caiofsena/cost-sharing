@@ -5,5 +5,6 @@ export * from "./Card";
 export * from "./Divider";
 export * from "./Input";
 export * from "./InputIcon";
+export * from "./Select";
 export * from "./StatusSelect";
 export * from "./icons";
