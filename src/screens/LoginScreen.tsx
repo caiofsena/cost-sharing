@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -10,15 +9,24 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { cssInterop } from "nativewind";
+import { Controller, useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
 
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { signIn, clearError } from "../store/authSlice";
+import { signIn } from "../store/authSlice";
 import { Divider, InputIcon } from "../components";
+import { loginSchema, type LoginFormData } from "../schemas/authSchema";
 import Logo from "../../assets/logo.svg";
 import MCI from "@expo/vector-icons/MaterialCommunityIcons";
+
+cssInterop(MCI, {
+  className: {
+    target: "style",
+  },
+});
 
 type AuthStackParamList = {
   Login: undefined;
@@ -29,34 +37,20 @@ export default function LoginScreen() {
   const navigation =
     useNavigation<NativeStackNavigationProp<AuthStackParamList>>();
   const dispatch = useAppDispatch();
-  const { loading, error } = useAppSelector((state) => state.auth);
+  const { loading, loginError } = useAppSelector((state) => state.auth);
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [localError, setLocalError] = useState("");
-
-  cssInterop(MCI, {
-    className: {
-      target: "style",
-    },
+  const {
+    control,
+    handleSubmit,
+    formState: { isValid },
+  } = useForm<LoginFormData>({
+    resolver: yupResolver(loginSchema),
+    mode: "onChange",
+    defaultValues: { email: "", password: "" },
   });
 
-  useEffect(() => {
-    if (error) {
-      setLocalError(error);
-    }
-  }, [error]);
-
-  function handleLogin() {
-    setLocalError("");
-    dispatch(clearError());
-
-    if (!email.trim() || !password.trim()) {
-      setLocalError("Preencha todos os campos");
-      return;
-    }
-
-    dispatch(signIn({ email: email.trim(), password }));
+  function onSubmit(data: LoginFormData) {
+    dispatch(signIn({ email: data.email.trim(), password: data.password }));
   }
 
   return (
@@ -83,41 +77,71 @@ export default function LoginScreen() {
                 Entre no app
               </Text>
 
-              {localError ? (
+              {loginError ? (
                 <View className="mb-4 rounded-md bg-danger-low p-3">
                   <Text className="text-center font-text-sm text-text-sm text-danger-light">
-                    {localError}
+                    {loginError}
                   </Text>
                 </View>
               ) : null}
 
               <View className="gap-4">
-                <InputIcon
-                  leftIcon={
-                    <MCI name="email-outline" size={20} className="color-gray-200" />
-                  }
-                  placeholder="E-mail"
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  value={email}
-                  onChangeText={setEmail}
+                <Controller
+                  control={control}
+                  name="email"
+                  render={({
+                    field: { onChange, onBlur, value },
+                    fieldState: { error: fieldError },
+                  }) => (
+                    <InputIcon
+                      leftIcon={
+                        <MCI
+                          name="email-outline"
+                          size={20}
+                          className="color-gray-200"
+                        />
+                      }
+                      placeholder="E-mail"
+                      keyboardType="email-address"
+                      autoCapitalize="none"
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                      error={fieldError?.message}
+                    />
+                  )}
                 />
 
-                <InputIcon
-                  leftIcon={
-                    <MCI name="asterisk" size={20} className="color-gray-200" />
-                  }
-                  placeholder="Senha"
-                  secureTextEntry
-                  value={password}
-                  onChangeText={setPassword}
+                <Controller
+                  control={control}
+                  name="password"
+                  render={({
+                    field: { onChange, onBlur, value },
+                    fieldState: { error: fieldError },
+                  }) => (
+                    <InputIcon
+                      leftIcon={
+                        <MCI
+                          name="asterisk"
+                          size={20}
+                          className="color-gray-200"
+                        />
+                      }
+                      placeholder="Senha"
+                      secureTextEntry
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                      error={fieldError?.message}
+                    />
+                  )}
                 />
               </View>
 
               <Pressable
-                className="mt-6 h-12 items-center justify-center rounded-full bg-green-base border border-green-light active:opacity-80"
-                onPress={handleLogin}
-                disabled={loading}
+                className="mt-6 h-12 items-center justify-center rounded-full bg-green-base border border-green-light active:opacity-80 disabled:opacity-50"
+                onPress={handleSubmit(onSubmit)}
+                disabled={!isValid || loading}
               >
                 {loading ? (
                   <ActivityIndicator color="#0B0B0E" />

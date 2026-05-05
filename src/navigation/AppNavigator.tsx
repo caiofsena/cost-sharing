@@ -103,13 +103,13 @@ function HomeTabs() {
 
 export default function AppNavigator() {
   const dispatch = useAppDispatch();
-  const { token, loading } = useAppSelector((state) => state.auth);
+  const { token, initialized } = useAppSelector((state) => state.auth);
 
   useEffect(() => {
     dispatch(checkStoredAuth());
   }, [dispatch]);
 
-  if (loading) {
+  if (!initialized) {
     return null;
   }
 

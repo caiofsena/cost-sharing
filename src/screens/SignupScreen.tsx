@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -10,15 +9,24 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { cssInterop } from "nativewind";
+import { Controller, useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
 
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { signUp, clearError } from "../store/authSlice";
+import { signUp } from "../store/authSlice";
 import { Divider, InputIcon } from "../components";
+import { signupSchema, type SignupFormData } from "../schemas/authSchema";
 import Logo from "../../assets/logo.svg";
 import MCI from "@expo/vector-icons/MaterialCommunityIcons";
+
+cssInterop(MCI, {
+  className: {
+    target: "style",
+  },
+});
 
 type AuthStackParamList = {
   Login: undefined;
@@ -29,50 +37,24 @@ export default function SignupScreen() {
   const navigation =
     useNavigation<NativeStackNavigationProp<AuthStackParamList>>();
   const dispatch = useAppDispatch();
-  const { loading, error } = useAppSelector((state) => state.auth);
+  const { loading, signupError } = useAppSelector((state) => state.auth);
 
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [localError, setLocalError] = useState("");
-
-  cssInterop(MCI, {
-    className: {
-      target: "style",
-    },
+  const {
+    control,
+    handleSubmit,
+    formState: { isValid },
+  } = useForm<SignupFormData>({
+    resolver: yupResolver(signupSchema),
+    mode: "onChange",
+    defaultValues: { name: "", email: "", password: "", confirmPassword: "" },
   });
 
-  useEffect(() => {
-    if (error) {
-      setLocalError(error);
-    }
-  }, [error]);
-
-  function handleSignup() {
-    setLocalError("");
-    dispatch(clearError());
-
-    if (!name.trim() || !email.trim() || !password || !confirmPassword) {
-      setLocalError("Preencha todos os campos");
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      setLocalError("As senhas não coincidem");
-      return;
-    }
-
-    if (password.length < 6) {
-      setLocalError("A senha deve ter pelo menos 6 caracteres");
-      return;
-    }
-
+  function onSubmit(data: SignupFormData) {
     dispatch(
       signUp({
-        name: name.trim(),
-        email: email.trim(),
-        password,
+        name: data.name.trim(),
+        email: data.email.trim(),
+        password: data.password,
       })
     );
   }
@@ -101,64 +83,120 @@ export default function SignupScreen() {
                 Crie sua conta
               </Text>
 
-              {localError ? (
+              {signupError ? (
                 <View className="mb-4 rounded-md bg-danger-low p-3">
                   <Text className="text-center font-text-sm text-text-sm text-danger-light">
-                    {localError}
+                    {signupError}
                   </Text>
                 </View>
               ) : null}
 
               <View className="gap-4">
-                <InputIcon
-                  leftIcon={
-                    <MCI
-                      name="account-circle-outline"
-                      size={20}
-                      className="color-gray-200"
+                <Controller
+                  control={control}
+                  name="name"
+                  render={({
+                    field: { onChange, onBlur, value },
+                    fieldState: { error: fieldError },
+                  }) => (
+                    <InputIcon
+                      leftIcon={
+                        <MCI
+                          name="account-circle-outline"
+                          size={20}
+                          className="color-gray-200"
+                        />
+                      }
+                      placeholder="Nome completo"
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                      error={fieldError?.message}
                     />
-                  }
-                  placeholder="Nome completo"
-                  value={name}
-                  onChangeText={setName}
+                  )}
                 />
 
-                <InputIcon
-                  leftIcon={
-                    <MCI name="email-outline" size={20} className="color-gray-200" />
-                  }
-                  placeholder="E-mail"
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  value={email}
-                  onChangeText={setEmail}
+                <Controller
+                  control={control}
+                  name="email"
+                  render={({
+                    field: { onChange, onBlur, value },
+                    fieldState: { error: fieldError },
+                  }) => (
+                    <InputIcon
+                      leftIcon={
+                        <MCI
+                          name="email-outline"
+                          size={20}
+                          className="color-gray-200"
+                        />
+                      }
+                      placeholder="E-mail"
+                      keyboardType="email-address"
+                      autoCapitalize="none"
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                      error={fieldError?.message}
+                    />
+                  )}
                 />
 
-                <InputIcon
-                  leftIcon={
-                    <MCI name="asterisk" size={20} className="color-gray-200" />
-                  }
-                  placeholder="Senha"
-                  secureTextEntry
-                  value={password}
-                  onChangeText={setPassword}
+                <Controller
+                  control={control}
+                  name="password"
+                  render={({
+                    field: { onChange, onBlur, value },
+                    fieldState: { error: fieldError },
+                  }) => (
+                    <InputIcon
+                      leftIcon={
+                        <MCI
+                          name="asterisk"
+                          size={20}
+                          className="color-gray-200"
+                        />
+                      }
+                      placeholder="Senha"
+                      secureTextEntry
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                      error={fieldError?.message}
+                    />
+                  )}
                 />
 
-                <InputIcon
-                  leftIcon={
-                    <MCI name="asterisk" size={20} className="color-gray-200" />
-                  }
-                  placeholder="Confirmar senha"
-                  secureTextEntry
-                  value={confirmPassword}
-                  onChangeText={setConfirmPassword}
+                <Controller
+                  control={control}
+                  name="confirmPassword"
+                  render={({
+                    field: { onChange, onBlur, value },
+                    fieldState: { error: fieldError },
+                  }) => (
+                    <InputIcon
+                      leftIcon={
+                        <MCI
+                          name="asterisk"
+                          size={20}
+                          className="color-gray-200"
+                        />
+                      }
+                      placeholder="Confirmar senha"
+                      secureTextEntry
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                      error={fieldError?.message}
+                    />
+                  )}
                 />
               </View>
 
               <Pressable
-                className="mt-6 h-12 items-center justify-center rounded-full bg-green-base border border-green-light active:opacity-80"
-                onPress={handleSignup}
-                disabled={loading}
+                className="mt-6 h-12 items-center justify-center rounded-full bg-green-base border border-green-light active:opacity-80 disabled:opacity-50"
+                onPress={handleSubmit(onSubmit)}
+                disabled={!isValid || loading}
               >
                 {loading ? (
                   <ActivityIndicator color="#0B0B0E" />

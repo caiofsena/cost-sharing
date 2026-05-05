@@ -11,14 +11,18 @@ interface AuthState {
     name: string;
   } | null;
   loading: boolean;
-  error: string | null;
+  initialized: boolean;
+  loginError: string | null;
+  signupError: string | null;
 }
 
 const initialState: AuthState = {
   token: null,
   user: null,
   loading: false,
-  error: null,
+  initialized: false,
+  loginError: null,
+  signupError: null,
 };
 
 export const checkStoredAuth = createAsyncThunk(
@@ -37,6 +41,17 @@ export const checkStoredAuth = createAsyncThunk(
   }
 );
 
+function extractErrorMessage(err: any, fallback: string): string {
+  const data = err?.response?.data;
+  if (typeof data === "string") return data;
+  if (data?.reason) return data.reason;
+  if (data?.message) return data.message;
+  if (data?.error) return data.error;
+  if (Array.isArray(data?.errors) && data.errors.length > 0) return data.errors[0];
+  if (err?.message) return err.message;
+  return fallback;
+}
+
 export const signIn = createAsyncThunk(
   "auth/signIn",
   async (data: SignInRequest, { rejectWithValue }) => {
@@ -47,9 +62,7 @@ export const signIn = createAsyncThunk(
         user: { id: response.id, email: response.email, name: response.name },
       };
     } catch (err: any) {
-      return rejectWithValue(
-        err?.response?.data?.message || "Erro ao fazer login"
-      );
+      return rejectWithValue(extractErrorMessage(err, "Erro ao fazer login"));
     }
   }
 );
@@ -64,13 +77,10 @@ export const signUp = createAsyncThunk(
         user: { id: response.id, email: response.email, name: response.name },
       };
     } catch (err: any) {
-      return rejectWithValue(
-        err?.response?.data?.message || "Erro ao criar conta"
-      );
+      return rejectWithValue(extractErrorMessage(err, "Erro ao criar conta"));
     }
   }
 );
-
 export const signOut = createAsyncThunk("auth/signOut", async () => {
   await authService.signOut();
 });
@@ -79,30 +89,36 @@ const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    clearError: (state) => {
-      state.error = null;
+    clearLoginError: (state) => {
+      state.loginError = null;
+    },
+    clearSignupError: (state) => {
+      state.signupError = null;
     },
   },
   extraReducers: (builder) => {
     builder
       .addCase(checkStoredAuth.pending, (state) => {
         state.loading = true;
-        state.error = null;
+        state.loginError = null;
+        state.signupError = null;
       })
       .addCase(checkStoredAuth.fulfilled, (state, action) => {
         state.loading = false;
+        state.initialized = true;
         state.token = action.payload.token;
         state.user = action.payload.user;
       })
       .addCase(checkStoredAuth.rejected, (state) => {
         state.loading = false;
+        state.initialized = true;
         state.token = null;
         state.user = null;
       })
 
       .addCase(signIn.pending, (state) => {
         state.loading = true;
-        state.error = null;
+        state.loginError = null;
       })
       .addCase(signIn.fulfilled, (state, action) => {
         state.loading = false;
@@ -111,12 +127,12 @@ const authSlice = createSlice({
       })
       .addCase(signIn.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as string;
+        state.loginError = action.payload as string;
       })
 
       .addCase(signUp.pending, (state) => {
         state.loading = true;
-        state.error = null;
+        state.signupError = null;
       })
       .addCase(signUp.fulfilled, (state, action) => {
         state.loading = false;
@@ -125,17 +141,18 @@ const authSlice = createSlice({
       })
       .addCase(signUp.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as string;
+        state.signupError = action.payload as string;
       })
 
       .addCase(signOut.fulfilled, (state) => {
         state.token = null;
         state.user = null;
         state.loading = false;
-        state.error = null;
+        state.loginError = null;
+        state.signupError = null;
       });
   },
 });
 
-export const { clearError } = authSlice.actions;
+export const { clearLoginError, clearSignupError } = authSlice.actions;
 export default authSlice.reducer;
