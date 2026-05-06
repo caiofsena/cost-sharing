@@ -6,13 +6,22 @@ import { Text } from "react-native";
 
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { checkStoredAuth } from "../store/authSlice";
+import MCI from "@expo/vector-icons/MaterialCommunityIcons";
+import { cssInterop } from "nativewind";
 
 import LoginScreen from "../screens/LoginScreen";
 import SignupScreen from "../screens/SignupScreen";
 import ComponentsScreen from "../screens/ComponentsScreen";
-import ExpensesScreen from "../screens/ExpensesScreen";
 import HomeScreen from "../screens/HomeScreen";
-import SettingsScreen from "../screens/SettingsScreen";
+import ActivitiesScreen from '../screens/Activities';
+import ResumeScreen from '../screens/Resume';
+import ParticipantsScreen from '../screens/Participants';
+
+cssInterop(MCI, {
+  className: {
+    target: "style",
+  },
+});
 
 type AuthStackParamList = {
   Login: undefined;
@@ -21,9 +30,10 @@ type AuthStackParamList = {
 
 type TabParamList = {
   Home: undefined;
+  Activities: undefined;
+  Resume: undefined;
+  Participants: undefined;
   Components: undefined;
-  Expenses: undefined;
-  Settings: undefined;
 };
 
 type RootStackParamList = {
@@ -49,8 +59,8 @@ function HomeTabs() {
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: "#30A65D",
-        tabBarInactiveTintColor: "#92929A",
+        tabBarActiveTintColor: "#E1E1E6",
+        tabBarInactiveTintColor: "#585860",
         tabBarStyle: {
           backgroundColor: "#121216",
           borderTopColor: "#2A2A2D",
@@ -68,32 +78,42 @@ function HomeTabs() {
         }}
       />
       <Tab.Screen
+        name="Activities"
+        component={ActivitiesScreen}
+        options={{
+          tabBarLabel: "Atividades",
+          tabBarIcon: ({ focused }: { focused: boolean }) => (
+            <MCI name="format-list-bulleted" size={24} className={focused ? "color-green-base" : "color-gray-400"} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Resume"
+        component={ResumeScreen}
+        options={{
+          tabBarLabel: "Resumo",
+          tabBarIcon: ({ focused }: { focused: boolean }) => (
+            <MCI name="chart-pie-outline" size={24} className={focused ? "color-green-base" : "color-gray-400"} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Participants"
+        component={ParticipantsScreen}
+        options={{
+          tabBarLabel: "Participantes",
+          tabBarIcon: ({ focused }: { focused: boolean }) => (
+            <MCI name="account-group" size={24} className={focused ? "color-green-base" : "color-gray-400"} />
+          ),
+        }}
+      />
+      <Tab.Screen
         name="Components"
         component={ComponentsScreen}
         options={{
           tabBarLabel: "Components",
           tabBarIcon: ({ color }: { color: string }) => (
             <Text style={{ color, fontSize: 20 }}>🧩</Text>
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Expenses"
-        component={ExpensesScreen}
-        options={{
-          tabBarLabel: "Expenses",
-          tabBarIcon: ({ color }: { color: string }) => (
-            <Text style={{ color, fontSize: 20 }}>💰</Text>
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Settings"
-        component={SettingsScreen}
-        options={{
-          tabBarLabel: "Settings",
-          tabBarIcon: ({ color }: { color: string }) => (
-            <Text style={{ color, fontSize: 20 }}>️</Text>
           ),
         }}
       />
