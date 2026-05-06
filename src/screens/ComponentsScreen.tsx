@@ -4,7 +4,6 @@ import { ScrollView, Text, View } from "react-native";
 import {
   ActivityCard,
   Badge,
-  BottomNavigation,
   Button,
   ExpenseCard,
   Input,
@@ -15,7 +14,6 @@ import {
 } from "../components";
 
 export default function ComponentsScreen() {
-  const [tab, setTab] = useState<"activities" | "summary" | "participants">("activities");
   const [status, setStatus] = useState<"pending" | "paid">("pending");
   const [selectedUsers, setSelectedUsers] = useState<SelectOption[]>([]);
 
@@ -34,12 +32,6 @@ export default function ComponentsScreen() {
           Variações baseadas nas referências.
         </Text>
       </View>
-
-      <Section title="Bottom Navigation">
-        <BottomNavigation value={tab} onChange={setTab} />
-        <BottomNavigation value="summary" />
-        <BottomNavigation value="participants" />
-      </Section>
 
       <Section title="Status Select">
         <View className="gap-6">

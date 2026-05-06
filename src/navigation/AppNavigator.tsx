@@ -13,9 +13,9 @@ import LoginScreen from "../screens/LoginScreen";
 import SignupScreen from "../screens/SignupScreen";
 import ComponentsScreen from "../screens/ComponentsScreen";
 import HomeScreen from "../screens/HomeScreen";
-import ActivitiesScreen from '../screens/Activities';
-import ResumeScreen from '../screens/Resume';
-import ParticipantsScreen from '../screens/Participants';
+import ActivitiesScreen from '../screens/ActivitiesScreen';
+import ResumeScreen from '../screens/ResumeScreen';
+import ParticipantsScreen from '../screens/ParticipantsScreen';
 
 cssInterop(MCI, {
   className: {
