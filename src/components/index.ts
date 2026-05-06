@@ -2,6 +2,7 @@ export * from "./Badge";
 export * from "./Button";
 export * from "./Card";
 export * from "./CreateActivityModal";
+export * from "./CreateExpenseModal";
 export * from "./Divider";
 export * from "./Input";
 export * from "./InputIcon";

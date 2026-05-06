@@ -14,6 +14,7 @@ import SignupScreen from "../screens/SignupScreen";
 import ComponentsScreen from "../screens/ComponentsScreen";
 import HomeScreen from "../screens/HomeScreen";
 import ActivitiesScreen from '../screens/ActivitiesScreen';
+import ExpensesScreen from '../screens/ExpensesScreen';
 import ResumeScreen from '../screens/ResumeScreen';
 import ParticipantsScreen from '../screens/ParticipantsScreen';
 
@@ -28,6 +29,11 @@ type AuthStackParamList = {
   Signup: undefined;
 };
 
+type ActivitiesStackParamList = {
+  Activities: undefined;
+  Expenses: { activityId: string };
+};
+
 type TabParamList = {
   Home: undefined;
   Activities: undefined;
@@ -39,9 +45,11 @@ type TabParamList = {
 type RootStackParamList = {
   Auth: undefined;
   Main: undefined;
+  Expenses: { activityId: string };
 };
 
 const AuthStack = createNativeStackNavigator<AuthStackParamList>();
+const ActivitiesStack = createNativeStackNavigator<ActivitiesStackParamList>();
 const Tab = createBottomTabNavigator<TabParamList>();
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 
@@ -51,6 +59,15 @@ function AuthNavigator() {
       <AuthStack.Screen name="Login" component={LoginScreen} />
       <AuthStack.Screen name="Signup" component={SignupScreen} />
     </AuthStack.Navigator>
+  );
+}
+
+function ActivitiesStackScreen() {
+  return (
+    <ActivitiesStack.Navigator screenOptions={{ headerShown: false }}>
+      <ActivitiesStack.Screen name="Activities" component={ActivitiesScreen} />
+      <ActivitiesStack.Screen name="Expenses" component={ExpensesScreen} />
+    </ActivitiesStack.Navigator>
   );
 }
 
@@ -79,7 +96,7 @@ function HomeTabs() {
       />
       <Tab.Screen
         name="Activities"
-        component={ActivitiesScreen}
+        component={ActivitiesStackScreen}
         options={{
           tabBarLabel: "Atividades",
           tabBarIcon: ({ focused }: { focused: boolean }) => (
@@ -139,7 +156,9 @@ export default function AppNavigator() {
     <NavigationContainer>
       <RootStack.Navigator screenOptions={{ headerShown: false }}>
         {isAuthenticated ? (
-          <RootStack.Screen name="Main" component={HomeTabs} />
+          <>
+            <RootStack.Screen name="Main" component={HomeTabs} />
+          </>
         ) : (
           <RootStack.Screen name="Auth" component={AuthNavigator} />
         )}

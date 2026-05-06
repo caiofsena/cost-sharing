@@ -29,7 +29,7 @@ function EmptyState() {
   );
 }
 
-function ActivityItem({ item }: { item: ActivityListItem }) {
+function ActivityItem({ item, onPress }: { item: ActivityListItem; onPress: () => void }) {
   const totalAmount = (item.totalAmountInCents / 100).toLocaleString("pt-BR", {
     style: "currency",
     currency: "BRL",
@@ -38,17 +38,19 @@ function ActivityItem({ item }: { item: ActivityListItem }) {
   const date = new Date(item.activityDate).toLocaleDateString("pt-BR");
 
   return (
-    <ActivityCard
-      title={item.name}
-      amount={totalAmount}
-      date={date}
-      participants={`${item.participantsAmount} pessoas`}
-      expenses={`${item.expensesAmount} despesa${item.expensesAmount !== 1 ? "s" : ""}`}
-    />
+    <Pressable onPress={onPress}>
+      <ActivityCard
+        title={item.name}
+        amount={totalAmount}
+        date={date}
+        participants={`${item.participantsAmount} pessoas`}
+        expenses={`${item.expensesAmount} despesa${item.expensesAmount !== 1 ? "s" : ""}`}
+      />
+    </Pressable>
   );
 }
 
-export default function ActivitiesScreen() {
+export default function ActivitiesScreen({ navigation }: any) {
   const { user } = useAppSelector((state) => state.auth);
   const [activities, setActivities] = useState<ActivityListItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -106,7 +108,12 @@ export default function ActivitiesScreen() {
         <FlatList
           data={activities}
           keyExtractor={(item) => item.id}
-          renderItem={({ item }) => <ActivityItem item={item} />}
+          renderItem={({ item }) => (
+            <ActivityItem
+              item={item}
+              onPress={() => navigation.navigate("Expenses", { activityId: item.id })}
+            />
+          )}
           contentContainerClassName="gap-4 px-6 py-4"
           showsVerticalScrollIndicator={false}
         />
