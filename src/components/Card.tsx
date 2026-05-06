@@ -1,8 +1,16 @@
 import { Text, View, type ViewProps } from "react-native";
 import { tv } from "tailwind-variants";
+import MCI from "@expo/vector-icons/MaterialCommunityIcons";
+import { cssInterop } from "nativewind";
 
 import { Badge } from "./Badge";
-import { CalendarIcon, CoinIcon, UsersIcon } from "./icons";
+import { CoinIcon, UsersIcon } from "./icons";
+
+cssInterop(MCI, {
+  className: {
+    target: "style",
+  },
+});
 
 const card = tv({
   base: "rounded-lg border border-gray-500 bg-gray-700 p-4",
@@ -40,19 +48,19 @@ export function ActivityCard({
 
       <View className="h-px bg-gray-500" />
 
-      <View className="flex-row flex-wrap items-center gap-4">
-        <View className="flex-row items-center gap-2">
-          <CalendarIcon />
+      <View className="flex-row flex-wrap items-center gap-3">
+        <View className="flex-row items-center gap-1">
+          <MCI name="calendar-outline" size={20} className="color-gray-400" />
           <Text className="font-text-sm text-text-sm text-gray-400">{date}</Text>
         </View>
 
-        <View className="flex-row items-center gap-2">
-          <UsersIcon />
+        <View className="flex-row items-center gap-1">
+          <MCI name="account-group" size={20} className="color-gray-400" />
           <Text className="font-text-sm text-text-sm text-gray-400">{participants}</Text>
         </View>
 
-        <View className="flex-row items-center gap-2">
-          <CoinIcon />
+        <View className="flex-row items-center gap-1">
+          <MCI name="currency-usd" size={20} className="color-gray-400" />
           <Text className="font-text-sm text-text-sm text-gray-400">{expenses}</Text>
         </View>
       </View>

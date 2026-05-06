@@ -77,7 +77,6 @@ export function Button({
     >
       {!isTextOnly && <PlusIcon className={iconColor} />}
       <Text className={styles.label()}>{label}</Text>
-      {!isTextOnly && size !== "icon" && <PlusIcon className={iconColor} />}
     </Pressable>
   );
 }
