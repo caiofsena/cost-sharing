@@ -120,10 +120,12 @@ export default function ActivitiesScreen({ navigation }: any) {
       )}
 
       <Button
-        label="Criar"
         onPress={() => setModalVisible(true)}
         className="absolute bottom-6 right-6"
-      />
+        hasIconLeft
+      >
+        <Text className="font-label-sm text-label-sm text-gray-800">Criar</Text>
+      </Button>
 
       <CreateActivityModal
         visible={modalVisible}

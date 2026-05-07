@@ -35,7 +35,9 @@ function EmptyState({ onCreate }: { onCreate: () => void }) {
       <Text className="mb-6 text-center font-label-md text-label-md text-gray-400">
         {`Para começar a dividir, \nregistre uma despesa`}
       </Text>
-      <Button label='Nova despesa' onPress={onCreate} />
+      <Button onPress={onCreate} hasIconLeft>
+        <Text className="font-label-sm text-label-sm text-gray-800">Nova despesa</Text>
+      </Button>
     </View>
   );
 }

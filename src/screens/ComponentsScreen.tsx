@@ -100,12 +100,12 @@ export default function ComponentsScreen() {
 
       <Section title="Buttons">
         <View className="items-center gap-8">
-          <Button intent="primary" label="Label" />
-          <Button intent="secondary" label="Label" />
-          <Button intent="danger" label="Label" />
-          <Button intent="primary" size="icon" />
-          <Button intent="secondary" size="icon" />
-          <Button intent="danger" size="icon" />
+          <Button intent="primary" ><Text className="font-label-sm text-label-sm text-gray-800">Primary</Text></Button>
+          <Button intent="secondary" ><Text className="font-label-sm text-label-sm text-gray-800">Secondary</Text></Button>
+          <Button intent="danger" ><Text className="font-label-sm text-label-sm text-gray-800">Danger</Text></Button>
+          <Button intent="primary" hasIconLeft><Text className="font-label-sm text-label-sm text-gray-800">Primary</Text></Button>
+          <Button intent="secondary" hasIconLeft><Text className="font-label-sm text-label-sm text-gray-800">Secondary</Text></Button>
+          <Button intent="danger" hasIconLeft><Text className="font-label-sm text-label-sm text-gray-800">Danger</Text></Button>
         </View>
       </Section>
     </ScrollView>
