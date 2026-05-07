@@ -1,12 +1,13 @@
 import { useEffect } from "react";
-import { ActivityIndicator, Modal, Pressable, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, Alert, Modal, Pressable, Text, TextInput, View } from "react-native";
 import MCI from "@expo/vector-icons/MaterialCommunityIcons";
 import { cssInterop } from "nativewind";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 
-import { expensesService } from "../services";
+import { activitiesService } from "../services";
+import { Button } from "./Button";
 
 cssInterop(MCI, {
   className: {
@@ -15,58 +16,81 @@ cssInterop(MCI, {
 });
 
 const schema = yup.object({
-  title: yup.string().required("Informe o nome da despesa").trim(),
-  amount: yup
-    .string()
-    .required("Informe um valor")
-    .test("is-valid-amount", "Informe um valor válido", (value) => {
-      if (!value) return false;
-      const num = parseFloat(value.replace(",", "."));
-      return !isNaN(num) && num > 0;
-    }),
+  title: yup.string().required("Informe o nome da atividade").trim(),
+  activityDate: yup.string().required("Informe a data").matches(/^\d{4}-\d{2}-\d{2}$/, "Formato: AAAA-MM-DD"),
 });
 
 type FormData = yup.InferType<typeof schema>;
 
-type CreateExpenseModalProps = {
+type EditActivityModalProps = {
   visible: boolean;
   activityId: string;
+  initialName: string;
+  initialDate: string;
   onClose: () => void;
   onSuccess: () => void;
+  onDelete: () => void;
 };
 
-export function CreateExpenseModal({ visible, activityId, onClose, onSuccess }: CreateExpenseModalProps) {
+export function EditActivityModal({
+  visible,
+  activityId,
+  initialName,
+  initialDate,
+  onClose,
+  onSuccess,
+  onDelete,
+}: EditActivityModalProps) {
   const { control, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<FormData>({
     resolver: yupResolver(schema),
     defaultValues: {
-      title: "",
-      amount: "",
+      title: initialName,
+      activityDate: initialDate.split("T")[0],
     },
   });
 
   useEffect(() => {
     if (visible) {
       reset({
-        title: "",
-        amount: "",
+        title: initialName,
+        activityDate: initialDate.split("T")[0],
       });
     }
-  }, [visible, reset]);
+  }, [visible, initialName, initialDate, reset]);
 
   async function onSubmit(data: FormData) {
-    const amountInCents = Math.round(parseFloat(data.amount.replace(",", ".")) * 100);
-
     try {
-      await expensesService.create(activityId, {
+      await activitiesService.update(activityId, {
         title: data.title.trim(),
-        amountInCents,
-        participantsIds: [],
+        activityDate: new Date(data.activityDate).toISOString(),
       });
       onSuccess();
       onClose();
     } catch (err: any) {
       console.error(err);
     }
+  }
+
+  function handleDelete() {
+    Alert.alert(
+      "Excluir atividade",
+      "Tem certeza que deseja excluir esta atividade? Esta ação não pode ser desfeita.",
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Excluir",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await activitiesService.delete(activityId);
+              onDelete();
+            } catch (err: any) {
+              console.error(err);
+            }
+          },
+        },
+      ]
+    );
   }
 
   function handleClose() {
@@ -91,7 +115,7 @@ export function CreateExpenseModal({ visible, activityId, onClose, onSuccess }: 
         >
           <View className="mb-6 flex-row items-center justify-between">
             <Text className="font-heading-lg text-heading-lg text-gray-100">
-              Nova Despesa
+              Editar Atividade
             </Text>
             <Pressable onPress={handleClose} className="p-1">
               <MCI name="close" size={24} className="color-gray-300" />
@@ -101,7 +125,7 @@ export function CreateExpenseModal({ visible, activityId, onClose, onSuccess }: 
           <View className="gap-5">
             <View>
               <Text className="mb-2 font-label-sm text-label-sm text-gray-300">
-                Nome da despesa
+                Nome da atividade
               </Text>
               <Controller
                 control={control}
@@ -110,7 +134,7 @@ export function CreateExpenseModal({ visible, activityId, onClose, onSuccess }: 
                   <>
                     <TextInput
                       className="h-12 rounded-md border border-gray-500 bg-gray-800 px-4 font-text-md text-text-md text-gray-100"
-                      placeholder="Ex: Aluguel"
+                      placeholder="Ex: Férias de verão"
                       placeholderTextColor="#585860"
                       value={value}
                       onChangeText={onChange}
@@ -127,24 +151,23 @@ export function CreateExpenseModal({ visible, activityId, onClose, onSuccess }: 
 
             <View>
               <Text className="mb-2 font-label-sm text-label-sm text-gray-300">
-                Valor total
+                Data
               </Text>
               <Controller
                 control={control}
-                name="amount"
+                name="activityDate"
                 render={({ field: { onChange, value } }) => (
                   <>
                     <TextInput
                       className="h-12 rounded-md border border-gray-500 bg-gray-800 px-4 font-text-md text-text-md text-gray-100"
-                      placeholder="R$ 0,00"
+                      placeholder="AAAA-MM-DD"
                       placeholderTextColor="#585860"
-                      keyboardType="decimal-pad"
                       value={value}
                       onChangeText={onChange}
                     />
-                    {errors.amount && (
+                    {errors.activityDate && (
                       <Text className="mt-1 font-text-xs text-text-xs text-danger-light">
-                        {errors.amount.message}
+                        {errors.activityDate.message}
                       </Text>
                     )}
                   </>
@@ -153,19 +176,25 @@ export function CreateExpenseModal({ visible, activityId, onClose, onSuccess }: 
             </View>
           </View>
 
-          <Pressable
-            className="mt-6 h-12 items-center justify-center rounded-full bg-green-base border border-green-light active:opacity-80"
-            onPress={handleSubmit(onSubmit)}
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? (
-              <ActivityIndicator color="#0B0B0E" />
-            ) : (
-              <Text className="font-label-md text-label-md text-gray-800">
-                Criar despesa
-              </Text>
-            )}
-          </Pressable>
+          <View className="mt-6 flex-row gap-3">
+            <Button intent="danger" onPress={handleDelete} disabled={isSubmitting}>
+              <MCI name="delete" size={24} className="color-danger-light" />
+            </Button>
+
+            <Pressable
+              className="flex-1 h-12 items-center justify-center rounded-full bg-green-base border border-green-light active:opacity-80"
+              onPress={handleSubmit(onSubmit)}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? (
+                <ActivityIndicator color="#0B0B0E" />
+              ) : (
+                <Text className="font-label-md text-label-md text-gray-800">
+                  Salvar alterações
+                </Text>
+              )}
+            </Pressable>
+          </View>
         </Pressable>
       </Pressable>
     </Modal>

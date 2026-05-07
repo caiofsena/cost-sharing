@@ -5,7 +5,7 @@ import MCI from "@expo/vector-icons/MaterialCommunityIcons";
 import { cssInterop } from "nativewind";
 
 import { activitiesService, expensesService } from "../services";
-import { Badge, Button, ExpenseCard, CreateExpenseModal } from "../components";
+import { Badge, Button, ExpenseCard, CreateExpenseModal, EditActivityModal } from "../components";
 import type {
   ActivityDetailResponse,
   ExpenseListItem,
@@ -70,6 +70,7 @@ export default function ExpensesScreen({ route, navigation }: ExpensesScreenProp
   const [expenses, setExpenses] = useState<ExpenseListItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
+  const [editModalVisible, setEditModalVisible] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -97,6 +98,18 @@ export default function ExpensesScreen({ route, navigation }: ExpensesScreenProp
 
   function handleCreateSuccess() {
     fetchData();
+  }
+
+  function handleEditActivity() {
+    setEditModalVisible(true);
+  }
+
+  function handleEditSuccess() {
+    fetchData();
+  }
+
+  function handleDeleteActivity() {
+    navigation.goBack();
   }
 
   if (loading) {
@@ -131,7 +144,10 @@ export default function ExpensesScreen({ route, navigation }: ExpensesScreenProp
             </Text>
           </Pressable>
 
-          <Pressable className="h-10 w-10 items-center justify-center rounded-full bg-gray-600">
+          <Pressable
+            className="h-10 w-10 items-center justify-center rounded-full bg-gray-600"
+            onPress={handleEditActivity}
+          >
             <MCI name="pencil" size={18} className="color-gray-200" />
           </Pressable>
         </View>
@@ -215,6 +231,18 @@ export default function ExpensesScreen({ route, navigation }: ExpensesScreenProp
         onClose={() => setModalVisible(false)}
         onSuccess={handleCreateSuccess}
       />
+
+      {activity && (
+        <EditActivityModal
+          visible={editModalVisible}
+          activityId={activityId}
+          initialName={activity.name}
+          initialDate={activity.activityDate}
+          onClose={() => setEditModalVisible(false)}
+          onSuccess={handleEditSuccess}
+          onDelete={handleDeleteActivity}
+        />
+      )}
     </SafeAreaView>
   );
 }
