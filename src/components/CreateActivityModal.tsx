@@ -6,7 +6,8 @@ import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 
-import { activitiesService } from "../services";
+import { useAppDispatch } from "../store/hooks";
+import { createActivity, fetchActivities } from "../store/activitiesSlice";
 
 cssInterop(MCI, {
   className: {
@@ -23,16 +24,17 @@ type FormData = yup.InferType<typeof schema>;
 
 type CreateActivityModalProps = {
   visible: boolean;
+  userId: string;
   onClose: () => void;
-  onSuccess: () => void;
 };
 
-export function CreateActivityModal({ visible, onClose, onSuccess }: CreateActivityModalProps) {
+export function CreateActivityModal({ visible, userId, onClose }: CreateActivityModalProps) {
+  const dispatch = useAppDispatch();
   const { control, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<FormData>({
     resolver: yupResolver(schema),
     defaultValues: {
       title: "",
-      activityDate: "",
+      activityDate: new Date().toISOString().split("T")[0],
     },
   });
 
@@ -40,21 +42,20 @@ export function CreateActivityModal({ visible, onClose, onSuccess }: CreateActiv
     if (visible) {
       reset({
         title: "",
-        activityDate: "",
+        activityDate: new Date().toISOString().split("T")[0],
       });
     }
   }, [visible, reset]);
 
   async function onSubmit(data: FormData) {
     try {
-      await activitiesService.create({
+      await dispatch(createActivity({
         title: data.title.trim(),
         activityDate: new Date(data.activityDate).toISOString(),
-      });
-      onSuccess();
+      })).unwrap();
+      dispatch(fetchActivities(userId));
       onClose();
-    } catch (err: any) {
-      console.error(err);
+    } catch {
     }
   }
 
@@ -89,6 +90,9 @@ export function CreateActivityModal({ visible, onClose, onSuccess }: CreateActiv
 
           <View className="gap-5">
             <View>
+              <Text className="mb-2 font-label-sm text-label-sm text-gray-300">
+                Nome da atividade
+              </Text>
               <Controller
                 control={control}
                 name="title"
@@ -96,7 +100,7 @@ export function CreateActivityModal({ visible, onClose, onSuccess }: CreateActiv
                   <>
                     <TextInput
                       className="h-12 rounded-md border border-gray-500 bg-gray-800 px-4 font-text-md text-text-md text-gray-100"
-                      placeholder="Título"
+                      placeholder="Ex: Férias de verão"
                       placeholderTextColor="#585860"
                       value={value}
                       onChangeText={onChange}
@@ -112,6 +116,9 @@ export function CreateActivityModal({ visible, onClose, onSuccess }: CreateActiv
             </View>
 
             <View>
+              <Text className="mb-2 font-label-sm text-label-sm text-gray-300">
+                Data
+              </Text>
               <Controller
                 control={control}
                 name="activityDate"
@@ -119,7 +126,7 @@ export function CreateActivityModal({ visible, onClose, onSuccess }: CreateActiv
                   <>
                     <TextInput
                       className="h-12 rounded-md border border-gray-500 bg-gray-800 px-4 font-text-md text-text-md text-gray-100"
-                      placeholder="Data"
+                      placeholder="AAAA-MM-DD"
                       placeholderTextColor="#585860"
                       value={value}
                       onChangeText={onChange}
@@ -144,7 +151,7 @@ export function CreateActivityModal({ visible, onClose, onSuccess }: CreateActiv
               <ActivityIndicator color="#0B0B0E" />
             ) : (
               <Text className="font-label-md text-label-md text-gray-800">
-                Salvar
+                Criar atividade
               </Text>
             )}
           </Pressable>

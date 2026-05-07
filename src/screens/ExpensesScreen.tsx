@@ -4,12 +4,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import MCI from "@expo/vector-icons/MaterialCommunityIcons";
 import { cssInterop } from "nativewind";
 
-import { activitiesService, expensesService } from "../services";
-import { Badge, Button, ExpenseCard, CreateExpenseModal, EditActivityModal } from "../components";
-import type {
-  ActivityDetailResponse,
-  ExpenseListItem,
-} from "../services/types";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { fetchActivityById, clearCurrent } from "../store/activitiesSlice";
+import { fetchExpensesByActivity } from "../store/expensesSlice";
+import { Button, ExpenseCard, CreateExpenseModal, EditActivityModal } from "../components";
 
 cssInterop(MCI, {
   className: {
@@ -42,7 +40,7 @@ function EmptyState({ onCreate }: { onCreate: () => void }) {
   );
 }
 
-function ExpenseItem({ item }: { item: ExpenseListItem }) {
+function ExpenseItem({ item }: { item: { id: string; name: string; amountInCents: number; participantsCount: number } }) {
   const totalAmount = (item.amountInCents / 100).toLocaleString("pt-BR", {
     style: "currency",
     currency: "BRL",
@@ -65,52 +63,36 @@ function ExpenseItem({ item }: { item: ExpenseListItem }) {
 }
 
 export default function ExpensesScreen({ route, navigation }: ExpensesScreenProps) {
+  const dispatch = useAppDispatch();
   const { activityId } = route.params;
-  const [activity, setActivity] = useState<ActivityDetailResponse | null>(null);
-  const [expenses, setExpenses] = useState<ExpenseListItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { user } = useAppSelector((state) => state.auth);
+  const { current: activity, loading: activityLoading } = useAppSelector((state) => state.activities);
+  const { items: expenses, loading: expensesLoading } = useAppSelector((state) => state.expenses);
   const [modalVisible, setModalVisible] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
 
   useEffect(() => {
-    fetchData();
-  }, [activityId]);
+    dispatch(fetchActivityById(activityId));
+    dispatch(fetchExpensesByActivity(activityId));
 
-  async function fetchData() {
-    try {
-      setLoading(true);
-      const [activityData, expensesData] = await Promise.all([
-        activitiesService.getById(activityId),
-        expensesService.listByActivity(activityId),
-      ]);
-      setActivity(activityData);
-      setExpenses(expensesData.expenses);
-    } catch (error) {
-      console.error("Erro ao buscar dados:", error);
-    } finally {
-      setLoading(false);
-    }
-  }
+    return () => {
+      dispatch(clearCurrent());
+    };
+  }, [dispatch, activityId]);
 
   function handleCreateExpense() {
     setModalVisible(true);
-  }
-
-  function handleCreateSuccess() {
-    fetchData();
   }
 
   function handleEditActivity() {
     setEditModalVisible(true);
   }
 
-  function handleEditSuccess() {
-    fetchData();
-  }
-
   function handleDeleteActivity() {
     navigation.goBack();
   }
+
+  const loading = activityLoading || expensesLoading;
 
   if (loading) {
     return (
@@ -229,17 +211,16 @@ export default function ExpensesScreen({ route, navigation }: ExpensesScreenProp
         visible={modalVisible}
         activityId={activityId}
         onClose={() => setModalVisible(false)}
-        onSuccess={handleCreateSuccess}
       />
 
       {activity && (
         <EditActivityModal
           visible={editModalVisible}
           activityId={activityId}
+          userId={user?.id ?? ""}
           initialName={activity.name}
           initialDate={activity.activityDate}
           onClose={() => setEditModalVisible(false)}
-          onSuccess={handleEditSuccess}
           onDelete={handleDeleteActivity}
         />
       )}

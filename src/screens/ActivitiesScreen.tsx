@@ -5,10 +5,9 @@ import Logo from "../../assets/logo.svg";
 import MCI from "@expo/vector-icons/MaterialCommunityIcons";
 import { cssInterop } from "nativewind";
 
-import { useAppSelector } from "../store/hooks";
-import { activitiesService } from "../services";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { fetchActivities } from "../store/activitiesSlice";
 import { ActivityCard, Button, CreateActivityModal } from "../components";
-import type { ActivityListItem } from "../services/types";
 
 cssInterop(MCI, {
   className: {
@@ -29,7 +28,7 @@ function EmptyState() {
   );
 }
 
-function ActivityItem({ item, onPress }: { item: ActivityListItem; onPress: () => void }) {
+function ActivityItem({ item, onPress }: { item: { id: string; name: string; activityDate: string; totalAmountInCents: number; participantsAmount: number; expensesAmount: number }; onPress: () => void }) {
   const totalAmount = (item.totalAmountInCents / 100).toLocaleString("pt-BR", {
     style: "currency",
     currency: "BRL",
@@ -51,32 +50,16 @@ function ActivityItem({ item, onPress }: { item: ActivityListItem; onPress: () =
 }
 
 export default function ActivitiesScreen({ navigation }: any) {
+  const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
-  const [activities, setActivities] = useState<ActivityListItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { items, loading } = useAppSelector((state) => state.activities);
   const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
-    fetchActivities();
-  }, []);
-
-  async function fetchActivities() {
-    if (!user?.id) return;
-
-    try {
-      setLoading(true);
-      const response = await activitiesService.listByUser(user.id);
-      setActivities(response.activities);
-    } catch (error) {
-      console.error("Erro ao buscar atividades:", error);
-    } finally {
-      setLoading(false);
+    if (user?.id) {
+      dispatch(fetchActivities(user.id));
     }
-  }
-
-  function handleCreateSuccess() {
-    fetchActivities();
-  }
+  }, [dispatch, user?.id]);
 
   if (loading) {
     return (
@@ -102,11 +85,11 @@ export default function ActivitiesScreen({ navigation }: any) {
         </Text>
       </View>
 
-      {activities.length === 0 ? (
+      {items.length === 0 ? (
         <EmptyState />
       ) : (
         <FlatList
-          data={activities}
+          data={items}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <ActivityItem
@@ -129,8 +112,8 @@ export default function ActivitiesScreen({ navigation }: any) {
 
       <CreateActivityModal
         visible={modalVisible}
+        userId={user?.id ?? ""}
         onClose={() => setModalVisible(false)}
-        onSuccess={handleCreateSuccess}
       />
     </SafeAreaView>
   );

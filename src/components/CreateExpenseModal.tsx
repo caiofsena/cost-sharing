@@ -6,7 +6,8 @@ import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 
-import { expensesService } from "../services";
+import { useAppDispatch } from "../store/hooks";
+import { createExpense, fetchExpensesByActivity } from "../store/expensesSlice";
 
 cssInterop(MCI, {
   className: {
@@ -32,10 +33,10 @@ type CreateExpenseModalProps = {
   visible: boolean;
   activityId: string;
   onClose: () => void;
-  onSuccess: () => void;
 };
 
-export function CreateExpenseModal({ visible, activityId, onClose, onSuccess }: CreateExpenseModalProps) {
+export function CreateExpenseModal({ visible, activityId, onClose }: CreateExpenseModalProps) {
+  const dispatch = useAppDispatch();
   const { control, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<FormData>({
     resolver: yupResolver(schema),
     defaultValues: {
@@ -57,15 +58,17 @@ export function CreateExpenseModal({ visible, activityId, onClose, onSuccess }: 
     const amountInCents = Math.round(parseFloat(data.amount.replace(",", ".")) * 100);
 
     try {
-      await expensesService.create(activityId, {
-        title: data.title.trim(),
-        amountInCents,
-        participantsIds: [],
-      });
-      onSuccess();
+      await dispatch(createExpense({
+        activityId,
+        data: {
+          title: data.title.trim(),
+          amountInCents,
+          participantsIds: [],
+        },
+      })).unwrap();
+      dispatch(fetchExpensesByActivity(activityId));
       onClose();
-    } catch (err: any) {
-      console.error(err);
+    } catch {
     }
   }
 
