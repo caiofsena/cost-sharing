@@ -32,7 +32,7 @@ export function CreateActivityModal({ visible, onClose, onSuccess }: CreateActiv
     resolver: yupResolver(schema),
     defaultValues: {
       title: "",
-      activityDate: new Date().toISOString().split("T")[0],
+      activityDate: "",
     },
   });
 
@@ -40,7 +40,7 @@ export function CreateActivityModal({ visible, onClose, onSuccess }: CreateActiv
     if (visible) {
       reset({
         title: "",
-        activityDate: new Date().toISOString().split("T")[0],
+        activityDate: "",
       });
     }
   }, [visible, reset]);
@@ -89,9 +89,6 @@ export function CreateActivityModal({ visible, onClose, onSuccess }: CreateActiv
 
           <View className="gap-5">
             <View>
-              <Text className="mb-2 font-label-sm text-label-sm text-gray-300">
-                Nome da atividade
-              </Text>
               <Controller
                 control={control}
                 name="title"
@@ -99,7 +96,7 @@ export function CreateActivityModal({ visible, onClose, onSuccess }: CreateActiv
                   <>
                     <TextInput
                       className="h-12 rounded-md border border-gray-500 bg-gray-800 px-4 font-text-md text-text-md text-gray-100"
-                      placeholder="Ex: Férias de verão"
+                      placeholder="Título"
                       placeholderTextColor="#585860"
                       value={value}
                       onChangeText={onChange}
@@ -115,9 +112,6 @@ export function CreateActivityModal({ visible, onClose, onSuccess }: CreateActiv
             </View>
 
             <View>
-              <Text className="mb-2 font-label-sm text-label-sm text-gray-300">
-                Data
-              </Text>
               <Controller
                 control={control}
                 name="activityDate"
@@ -125,7 +119,7 @@ export function CreateActivityModal({ visible, onClose, onSuccess }: CreateActiv
                   <>
                     <TextInput
                       className="h-12 rounded-md border border-gray-500 bg-gray-800 px-4 font-text-md text-text-md text-gray-100"
-                      placeholder="AAAA-MM-DD"
+                      placeholder="Data"
                       placeholderTextColor="#585860"
                       value={value}
                       onChangeText={onChange}
@@ -150,7 +144,7 @@ export function CreateActivityModal({ visible, onClose, onSuccess }: CreateActiv
               <ActivityIndicator color="#0B0B0E" />
             ) : (
               <Text className="font-label-md text-label-md text-gray-800">
-                Criar atividade
+                Salvar
               </Text>
             )}
           </Pressable>
