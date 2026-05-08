@@ -128,9 +128,6 @@ export function EditActivityModal({
 
           <View className="gap-5">
             <View>
-              <Text className="mb-2 font-label-sm text-label-sm text-gray-300">
-                Nome da atividade
-              </Text>
               <Controller
                 control={control}
                 name="title"
@@ -154,9 +151,6 @@ export function EditActivityModal({
             </View>
 
             <View>
-              <Text className="mb-2 font-label-sm text-label-sm text-gray-300">
-                Data
-              </Text>
               <Controller
                 control={control}
                 name="activityDate"
@@ -180,13 +174,13 @@ export function EditActivityModal({
             </View>
           </View>
 
-          <View className="mt-6 flex-row gap-3">
+          <View className="mt-6 flex-row gap-3 justify-between">
             <Button intent="danger" onPress={handleDelete} disabled={isSubmitting}>
-              <MCI name="delete" size={24} className="color-danger-light" />
+              <MCI name="delete-outline" size={24} className="color-danger-light" />
             </Button>
 
-            <Pressable
-              className="flex-1 h-12 items-center justify-center rounded-full bg-green-base border border-green-light active:opacity-80"
+            <Button
+              className="h-12 items-center justify-center rounded-full bg-green-base border border-green-light active:opacity-80"
               onPress={handleSubmit(onSubmit)}
               disabled={isSubmitting}
             >
@@ -194,10 +188,10 @@ export function EditActivityModal({
                 <ActivityIndicator color="#0B0B0E" />
               ) : (
                 <Text className="font-label-md text-label-md text-gray-800">
-                  Salvar alterações
+                  Salvar
                 </Text>
               )}
-            </Pressable>
+            </Button>
           </View>
         </Pressable>
       </Pressable>

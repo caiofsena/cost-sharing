@@ -8,6 +8,7 @@ import * as yup from "yup";
 
 import { useAppDispatch } from "../store/hooks";
 import { createActivity, fetchActivities } from "../store/activitiesSlice";
+import { Input } from './Input';
 
 cssInterop(MCI, {
   className: {
@@ -34,7 +35,7 @@ export function CreateActivityModal({ visible, userId, onClose }: CreateActivity
     resolver: yupResolver(schema),
     defaultValues: {
       title: "",
-      activityDate: new Date().toISOString().split("T")[0],
+      activityDate: "",
     },
   });
 
@@ -42,7 +43,7 @@ export function CreateActivityModal({ visible, userId, onClose }: CreateActivity
     if (visible) {
       reset({
         title: "",
-        activityDate: new Date().toISOString().split("T")[0],
+        activityDate: "",
       });
     }
   }, [visible, reset]);
@@ -90,17 +91,14 @@ export function CreateActivityModal({ visible, userId, onClose }: CreateActivity
 
           <View className="gap-5">
             <View>
-              <Text className="mb-2 font-label-sm text-label-sm text-gray-300">
-                Nome da atividade
-              </Text>
               <Controller
                 control={control}
                 name="title"
                 render={({ field: { onChange, value } }) => (
                   <>
-                    <TextInput
+                    <Input
                       className="h-12 rounded-md border border-gray-500 bg-gray-800 px-4 font-text-md text-text-md text-gray-100"
-                      placeholder="Ex: Férias de verão"
+                      placeholder="Título"
                       placeholderTextColor="#585860"
                       value={value}
                       onChangeText={onChange}
@@ -116,17 +114,14 @@ export function CreateActivityModal({ visible, userId, onClose }: CreateActivity
             </View>
 
             <View>
-              <Text className="mb-2 font-label-sm text-label-sm text-gray-300">
-                Data
-              </Text>
               <Controller
                 control={control}
                 name="activityDate"
                 render={({ field: { onChange, value } }) => (
                   <>
-                    <TextInput
+                    <Input
                       className="h-12 rounded-md border border-gray-500 bg-gray-800 px-4 font-text-md text-text-md text-gray-100"
-                      placeholder="AAAA-MM-DD"
+                      placeholder="Data"
                       placeholderTextColor="#585860"
                       value={value}
                       onChangeText={onChange}
@@ -151,7 +146,7 @@ export function CreateActivityModal({ visible, userId, onClose }: CreateActivity
               <ActivityIndicator color="#0B0B0E" />
             ) : (
               <Text className="font-label-md text-label-md text-gray-800">
-                Criar atividade
+                Salvar
               </Text>
             )}
           </Pressable>
