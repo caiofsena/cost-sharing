@@ -6,7 +6,7 @@ import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 
-import { useAppDispatch } from "../store/hooks";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { createExpense, fetchExpensesByActivity } from "../store/expensesSlice";
 
 cssInterop(MCI, {
@@ -37,6 +37,7 @@ type CreateExpenseModalProps = {
 
 export function CreateExpenseModal({ visible, activityId, onClose }: CreateExpenseModalProps) {
   const dispatch = useAppDispatch();
+  const { error } = useAppSelector((state) => state.expenses);
   const { control, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<FormData>({
     resolver: yupResolver(schema),
     defaultValues: {
@@ -100,6 +101,14 @@ export function CreateExpenseModal({ visible, activityId, onClose }: CreateExpen
               <MCI name="close" size={24} className="color-gray-300" />
             </Pressable>
           </View>
+
+          {error ? (
+            <View className="mb-4 rounded-md bg-danger-low p-3">
+              <Text className="text-center font-text-sm text-text-sm text-danger-light">
+                {error}
+              </Text>
+            </View>
+          ) : null}
 
           <View className="gap-5">
             <View>
