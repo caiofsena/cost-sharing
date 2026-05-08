@@ -5,6 +5,8 @@ export * from "./CreateActivityModal";
 export * from "./CreateExpenseModal";
 export * from "./Divider";
 export * from "./EditActivityModal";
+export * from "./EditExpenseFormModal";
+export * from "./EditExpenseModal";
 export * from "./Input";
 export * from "./InputIcon";
 export * from "./Select";

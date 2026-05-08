@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Modal, Pressable, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, Alert, Modal, Pressable, Text, TextInput, View } from "react-native";
 import MCI from "@expo/vector-icons/MaterialCommunityIcons";
 import { cssInterop } from "nativewind";
 import { useForm, Controller } from "react-hook-form";
@@ -7,7 +7,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 
 import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { clearError, createExpense, fetchExpensesByActivity } from "../store/expensesSlice";
+import { updateExpense, fetchExpensesByActivity, deleteExpense, clearError } from "../store/expensesSlice";
 import { Select, type SelectOption } from "./Select";
 
 cssInterop(MCI, {
@@ -30,42 +30,62 @@ const schema = yup.object({
 
 type FormData = yup.InferType<typeof schema>;
 
-type CreateExpenseModalProps = {
+type EditExpenseFormModalProps = {
   visible: boolean;
+  expenseId: string;
   activityId: string;
+  initialTitle: string;
+  initialAmountInCents: number;
+  initialParticipantIds: string[];
   onClose: () => void;
 };
 
-export function CreateExpenseModal({ visible, activityId, onClose }: CreateExpenseModalProps) {
+export function EditExpenseFormModal({
+  visible,
+  expenseId,
+  activityId,
+  initialTitle,
+  initialAmountInCents,
+  initialParticipantIds,
+  onClose,
+}: EditExpenseFormModalProps) {
   const dispatch = useAppDispatch();
   const { current: activity } = useAppSelector((state) => state.activities);
   const { error } = useAppSelector((state) => state.expenses);
   const { control, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<FormData>({
     resolver: yupResolver(schema),
     defaultValues: {
-      title: "",
-      amount: "",
+      title: initialTitle,
+      amount: (initialAmountInCents / 100).toFixed(2).replace(".", ","),
     },
   });
   const [selectedParticipants, setSelectedParticipants] = useState<SelectOption[]>([]);
 
   useEffect(() => {
     if (visible) {
+      const participantOptions: SelectOption[] = (activity?.participants ?? [])
+        .filter((p) => initialParticipantIds.includes(p.id))
+        .map((p) => ({
+          id: p.id,
+          name: p.name,
+          initials: p.name.substring(0, 2).toUpperCase(),
+        }));
+
       reset({
-        title: "",
-        amount: "",
+        title: initialTitle,
+        amount: (initialAmountInCents / 100).toFixed(2).replace(".", ","),
       });
-      setSelectedParticipants([]);
+      setSelectedParticipants(participantOptions);
     }
-  }, [visible, reset]);
+  }, [visible, initialTitle, initialAmountInCents, initialParticipantIds, activity, reset]);
 
   async function onSubmit(data: FormData) {
     const amountInCents = Math.round(parseFloat(data.amount.replace(",", ".")) * 100);
     const participantIds = selectedParticipants.map((p) => p.id);
 
     try {
-      await dispatch(createExpense({
-        activityId,
+      await dispatch(updateExpense({
+        expenseId,
         data: {
           title: data.title.trim(),
           amountInCents,
@@ -76,6 +96,28 @@ export function CreateExpenseModal({ visible, activityId, onClose }: CreateExpen
       onClose();
     } catch {
     }
+  }
+
+  function handleDelete() {
+    Alert.alert(
+      "Excluir despesa",
+      "Tem certeza que deseja excluir esta despesa? Esta ação não pode ser desfeita.",
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Excluir",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await dispatch(deleteExpense(expenseId)).unwrap();
+              dispatch(fetchExpensesByActivity(activityId));
+              onClose();
+            } catch {
+            }
+          },
+        },
+      ]
+    );
   }
 
   function handleClose() {
@@ -90,6 +132,11 @@ export function CreateExpenseModal({ visible, activityId, onClose }: CreateExpen
     name: p.name,
     initials: p.name.substring(0, 2).toUpperCase(),
   }));
+
+  const amountDisplay = (initialAmountInCents / 100).toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  });
 
   return (
     <Modal
@@ -106,10 +153,15 @@ export function CreateExpenseModal({ visible, activityId, onClose }: CreateExpen
           className="w-full rounded-t-3xl bg-gray-700 px-6 pt-6 pb-8"
           onPress={(e) => e.stopPropagation()}
         >
-          <View className="mb-6 flex-row items-center justify-between">
-            <Text className="font-heading-lg text-heading-lg text-gray-100">
-              Nova despesa
-            </Text>
+          <View className="mb-6 flex-row items-start justify-between">
+            <View className="flex-1 pr-4">
+              <Text className="font-heading-lg text-heading-lg text-gray-100">
+                Editar despesa
+              </Text>
+              <Text className="mt-1 font-heading-md text-heading-md text-green-base">
+                {amountDisplay}
+              </Text>
+            </View>
             <Pressable onPress={handleClose} className="p-1">
               <MCI name="close" size={24} className="color-gray-300" />
             </Pressable>
@@ -182,24 +234,33 @@ export function CreateExpenseModal({ visible, activityId, onClose }: CreateExpen
                 value={selectedParticipants}
                 onChange={setSelectedParticipants}
                 placeholder="Participantes"
-                error={errors.title?.message}
               />
             </View>
           </View>
 
-          <Pressable
-            className="mt-6 h-12 items-center justify-center rounded-full bg-green-base active:opacity-80"
-            onPress={handleSubmit(onSubmit)}
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? (
-              <ActivityIndicator color="#0B0B0E" />
-            ) : (
-              <Text className="font-label-md text-label-md text-gray-800">
-                Salvar
-              </Text>
-            )}
-          </Pressable>
+          <View className="mt-6 flex-row gap-4">
+            <Pressable
+              className="h-12 w-12 items-center justify-center rounded-full bg-gray-600 active:opacity-80"
+              onPress={handleDelete}
+              disabled={isSubmitting}
+            >
+              <MCI name="delete-outline" size={22} className="color-danger-light" />
+            </Pressable>
+
+            <Pressable
+              className="flex-1 h-12 items-center justify-center rounded-full bg-green-base active:opacity-80"
+              onPress={handleSubmit(onSubmit)}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? (
+                <ActivityIndicator color="#0B0B0E" />
+              ) : (
+                <Text className="font-label-md text-label-md text-gray-800">
+                  Salvar
+                </Text>
+              )}
+            </Pressable>
+          </View>
         </Pressable>
       </Pressable>
     </Modal>

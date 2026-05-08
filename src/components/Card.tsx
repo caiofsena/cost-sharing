@@ -95,7 +95,7 @@ export function ExpenseCard({
         </View>
       </View>
 
-      <View className="flex-row items-end justify-between gap-4">
+      <View className="flex-row items-end justify-between gap-4 border-t border-gray-600 pt-3">
         <AvatarStack initials={initials} size="sm" />
         <Badge status={status} />
       </View>

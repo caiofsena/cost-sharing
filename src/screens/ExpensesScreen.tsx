@@ -5,9 +5,10 @@ import MCI from "@expo/vector-icons/MaterialCommunityIcons";
 import { cssInterop } from "nativewind";
 
 import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { fetchActivityById, clearCurrent } from "../store/activitiesSlice";
-import { fetchExpensesByActivity } from "../store/expensesSlice";
-import { Button, ExpenseCard, CreateExpenseModal, EditActivityModal } from "../components";
+import { fetchActivityById, clearCurrent, fetchActivities } from "../store/activitiesSlice";
+import { fetchExpensesByActivity, fetchExpenseById, clearCurrent as clearExpenseCurrent } from "../store/expensesSlice";
+import { Button, ExpenseCard, CreateExpenseModal, EditActivityModal, EditExpenseModal, EditExpenseFormModal } from "../components";
+import type { ExpenseDetailResponse } from "../services/types";
 
 cssInterop(MCI, {
   className: {
@@ -40,7 +41,7 @@ function EmptyState({ onCreate }: { onCreate: () => void }) {
   );
 }
 
-function ExpenseItem({ item }: { item: { id: string; name: string; amountInCents: number; participantsCount: number } }) {
+function ExpenseItem({ item, onPress }: { item: { id: string; name: string; amountInCents: number; participantsCount: number }; onPress: () => void }) {
   const totalAmount = (item.amountInCents / 100).toLocaleString("pt-BR", {
     style: "currency",
     currency: "BRL",
@@ -52,13 +53,15 @@ function ExpenseItem({ item }: { item: { id: string; name: string; amountInCents
   });
 
   return (
-    <ExpenseCard
-      title={item.name}
-      amount={totalAmount}
-      perPerson={`${perPerson} / pessoa`}
-      initials={["JS", "MO"]}
-      status="pending"
-    />
+    <Pressable onPress={onPress}>
+      <ExpenseCard
+        title={item.name}
+        amount={totalAmount}
+        perPerson={`${perPerson} / pessoa`}
+        initials={["JS", "MO"]}
+        status="pending"
+      />
+    </Pressable>
   );
 }
 
@@ -68,8 +71,11 @@ export default function ExpensesScreen({ route, navigation }: ExpensesScreenProp
   const { user } = useAppSelector((state) => state.auth);
   const { current: activity, loading: activityLoading } = useAppSelector((state) => state.activities);
   const { items: expenses, loading: expensesLoading } = useAppSelector((state) => state.expenses);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [editModalVisible, setEditModalVisible] = useState(false);
+  const [createModalVisible, setCreateModalVisible] = useState(false);
+  const [editActivityModalVisible, setEditActivityModalVisible] = useState(false);
+  const [editExpenseModalVisible, setEditExpenseModalVisible] = useState(false);
+  const [editExpenseFormModalVisible, setEditExpenseFormModalVisible] = useState(false);
+  const [selectedExpense, setSelectedExpense] = useState<ExpenseDetailResponse | null>(null);
 
   useEffect(() => {
     dispatch(fetchActivityById(activityId));
@@ -77,19 +83,45 @@ export default function ExpensesScreen({ route, navigation }: ExpensesScreenProp
 
     return () => {
       dispatch(clearCurrent());
+      dispatch(clearExpenseCurrent());
     };
   }, [dispatch, activityId]);
 
+  useEffect(() => {
+    if (user?.id) {
+      dispatch(fetchActivities(user.id));
+    }
+  }, [dispatch, user?.id]);
+
+  async function handleOpenExpense(expenseId: string) {
+    try {
+      const result = await dispatch(fetchExpenseById(expenseId)).unwrap();
+      setSelectedExpense(result);
+      setEditExpenseModalVisible(true);
+    } catch {
+    }
+  }
+
   function handleCreateExpense() {
-    setModalVisible(true);
+    setCreateModalVisible(true);
   }
 
   function handleEditActivity() {
-    setEditModalVisible(true);
+    setEditActivityModalVisible(true);
   }
 
   function handleDeleteActivity() {
     navigation.goBack();
+  }
+
+  function handleOpenEditExpenseForm() {
+    if (!selectedExpense) return;
+    setEditExpenseModalVisible(false);
+    setEditExpenseFormModalVisible(true);
+  }
+
+  function handleCloseEditExpenseForm() {
+    setEditExpenseFormModalVisible(false);
   }
 
   const loading = activityLoading || expensesLoading;
@@ -120,8 +152,8 @@ export default function ExpensesScreen({ route, navigation }: ExpensesScreenProp
             className="flex-row items-center gap-1"
             onPress={() => navigation.goBack()}
           >
-            <MCI name="arrow-left" size={20} className="color-green-base" />
-            <Text className="font-label-sm text-label-sm text-green-base">
+            <MCI name="arrow-left" size={20} className="color-green-light" />
+            <Text className="font-label-sm text-label-sm text-green-light">
               Voltar
             </Text>
           </Pressable>
@@ -149,7 +181,7 @@ export default function ExpensesScreen({ route, navigation }: ExpensesScreenProp
         <EmptyState onCreate={handleCreateExpense} />
       ) : (
         <>
-          <View className="flex-row items-center justify-between border-b border-gray-500 px-6 py-4">
+          <View className="flex-row items-center justify-between px-6 py-4">
             <View className="flex-row items-center gap-3">
               <View className="flex-row">
                 {activity?.participants.slice(0, 3).map((p, i) => (
@@ -169,7 +201,7 @@ export default function ExpensesScreen({ route, navigation }: ExpensesScreenProp
             </View>
 
             <View className="items-end">
-              <Text className="font-label-md text-label-md text-green-base">
+              <Text className="font-label-md text-label-md text-green-light">
                 {totalFormatted}
               </Text>
               <Text className="font-text-xs text-text-xs text-gray-400">
@@ -178,8 +210,8 @@ export default function ExpensesScreen({ route, navigation }: ExpensesScreenProp
             </View>
           </View>
 
-          <View className="flex-row items-center justify-between border-b border-gray-500 px-6 py-3">
-            <Text className="font-label-sm text-label-sm text-gray-300">
+          <View className="flex-row items-center justify-between px-6 py-3">
+            <Text className="font-label-sm text-label-sm text-gray-200">
               Despesas
             </Text>
             <Text className="font-text-sm text-text-sm text-gray-400">
@@ -190,7 +222,12 @@ export default function ExpensesScreen({ route, navigation }: ExpensesScreenProp
           <FlatList
             data={expenses}
             keyExtractor={(item) => item.id}
-            renderItem={({ item }) => <ExpenseItem item={item} />}
+            renderItem={({ item }) => (
+              <ExpenseItem
+                item={item}
+                onPress={() => handleOpenExpense(item.id)}
+              />
+            )}
             contentContainerClassName="gap-4 px-6 py-4"
             showsVerticalScrollIndicator={false}
           />
@@ -198,30 +235,55 @@ export default function ExpensesScreen({ route, navigation }: ExpensesScreenProp
       )}
 
       { expenses.length > 0 && (
-        <Pressable
-          className="absolute bottom-24 right-6 flex-row items-center gap-2 rounded-full bg-green-base border border-green-light px-5 py-3 active:opacity-80"
+        <Button
+          className="absolute bottom-6 right-6"
           onPress={handleCreateExpense}
+          hasIconLeft
         >
-          <MCI name="plus" size={18} className="color-gray-800" />
           <Text className="font-label-sm text-label-sm text-gray-800">Nova</Text>
-        </Pressable>
+        </Button>
       )}
 
       <CreateExpenseModal
-        visible={modalVisible}
+        visible={createModalVisible}
         activityId={activityId}
-        onClose={() => setModalVisible(false)}
+        onClose={() => setCreateModalVisible(false)}
       />
 
       {activity && (
         <EditActivityModal
-          visible={editModalVisible}
+          visible={editActivityModalVisible}
           activityId={activityId}
           userId={user?.id ?? ""}
           initialName={activity.name}
           initialDate={activity.activityDate}
-          onClose={() => setEditModalVisible(false)}
+          onClose={() => setEditActivityModalVisible(false)}
           onDelete={handleDeleteActivity}
+        />
+      )}
+
+      {selectedExpense && (
+        <EditExpenseModal
+          visible={editExpenseModalVisible}
+          expense={selectedExpense}
+          activityId={activityId}
+          onClose={() => {
+            setEditExpenseModalVisible(false);
+            setSelectedExpense(null);
+          }}
+          onEdit={handleOpenEditExpenseForm}
+        />
+      )}
+
+      {selectedExpense && (
+        <EditExpenseFormModal
+          visible={editExpenseFormModalVisible}
+          expenseId={selectedExpense.id}
+          activityId={activityId}
+          initialTitle={selectedExpense.name}
+          initialAmountInCents={selectedExpense.amountInCents}
+          initialParticipantIds={selectedExpense.participants.map((p) => p.userId)}
+          onClose={handleCloseEditExpenseForm}
         />
       )}
     </SafeAreaView>

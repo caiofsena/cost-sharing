@@ -7,7 +7,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 
 import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { createActivity, fetchActivities } from "../store/activitiesSlice";
+import { clearError, createActivity, fetchActivities } from "../store/activitiesSlice";
 import { Input } from './Input';
 
 cssInterop(MCI, {
@@ -61,9 +61,10 @@ export function CreateActivityModal({ visible, userId, onClose }: CreateActivity
     }
   }
 
-  function handleClose() {
+  async function handleClose() {
     reset();
     onClose();
+    dispatch(clearError());
   }
 
   return (

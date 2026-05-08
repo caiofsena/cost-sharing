@@ -88,6 +88,17 @@ export const deleteExpense = createAsyncThunk(
   }
 );
 
+export const toggleParticipantPayment = createAsyncThunk(
+  "expenses/toggleParticipantPayment",
+  async ({ expenseId, participantId }: { expenseId: string; participantId: string }, { rejectWithValue }) => {
+    try {
+      return await expensesService.toggleParticipantPayment(expenseId, participantId);
+    } catch (err: any) {
+      return rejectWithValue(extractErrorMessage(err, "Erro ao alternar pagamento"));
+    }
+  }
+);
+
 const expensesSlice = createSlice({
   name: "expenses",
   initialState,
@@ -194,6 +205,18 @@ const expensesSlice = createSlice({
       .addCase(deleteExpense.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
+      })
+
+      .addCase(toggleParticipantPayment.fulfilled, (state, action) => {
+        const { expenseId, participantId, paymentStatus } = action.payload;
+        if (state.current?.id === expenseId) {
+          const participant = state.current.participants.find((p) => p.userId === participantId);
+          if (participant) {
+            participant.paymentStatus = paymentStatus;
+            participant.amountPaidInCents = action.payload.amountPaidInCents;
+            participant.remainingDebtInCents = action.payload.remainingDebtInCents;
+          }
+        }
       });
   },
 });
