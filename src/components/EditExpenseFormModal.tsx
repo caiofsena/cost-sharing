@@ -9,6 +9,7 @@ import * as yup from "yup";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { updateExpense, fetchExpensesByActivity, deleteExpense, clearError } from "../store/expensesSlice";
 import { Select, type SelectOption } from "./Select";
+import { Button } from './Button';
 
 cssInterop(MCI, {
   className: {
@@ -50,7 +51,7 @@ export function EditExpenseFormModal({
   onClose,
 }: EditExpenseFormModalProps) {
   const dispatch = useAppDispatch();
-  const { current: activity } = useAppSelector((state) => state.activities);
+  const { users } = useAppSelector((state) => state.auth);
   const { error } = useAppSelector((state) => state.expenses);
   const { control, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<FormData>({
     resolver: yupResolver(schema),
@@ -63,12 +64,12 @@ export function EditExpenseFormModal({
 
   useEffect(() => {
     if (visible) {
-      const participantOptions: SelectOption[] = (activity?.participants ?? [])
-        .filter((p) => initialParticipantIds.includes(p.id))
+      const participantOptions: SelectOption[] = (users ?? [])
+        .filter((p) => initialParticipantIds.includes(p?.id ?? ""))
         .map((p) => ({
-          id: p.id,
-          name: p.name,
-          initials: p.name.substring(0, 2).toUpperCase(),
+          id: p?.id ?? "",
+          name: p?.name ?? "",
+          initials: p?.name.substring(0, 2).toUpperCase() ?? "",
         }));
 
       reset({
@@ -77,7 +78,7 @@ export function EditExpenseFormModal({
       });
       setSelectedParticipants(participantOptions);
     }
-  }, [visible, initialTitle, initialAmountInCents, initialParticipantIds, activity, reset]);
+  }, [visible, initialTitle, initialAmountInCents, initialParticipantIds, users, reset]);
 
   async function onSubmit(data: FormData) {
     const amountInCents = Math.round(parseFloat(data.amount.replace(",", ".")) * 100);
@@ -127,10 +128,10 @@ export function EditExpenseFormModal({
     dispatch(clearError());
   }
 
-  const participantOptions: SelectOption[] = (activity?.participants ?? []).map((p) => ({
-    id: p.id,
-    name: p.name,
-    initials: p.name.substring(0, 2).toUpperCase(),
+  const participantOptions: SelectOption[] = (users ?? []).map((p) => ({
+    id: p?.id ?? "",
+    name: p?.name ?? "",
+    initials: p?.name.substring(0, 2).toUpperCase() ?? "",
   }));
 
   const amountDisplay = (initialAmountInCents / 100).toLocaleString("pt-BR", {
@@ -238,7 +239,7 @@ export function EditExpenseFormModal({
             </View>
           </View>
 
-          <View className="mt-6 flex-row gap-4">
+          <View className="mt-6 flex-row gap-4 justify-between">
             <Pressable
               className="h-12 w-12 items-center justify-center rounded-full bg-gray-600 active:opacity-80"
               onPress={handleDelete}
@@ -247,8 +248,7 @@ export function EditExpenseFormModal({
               <MCI name="delete-outline" size={22} className="color-danger-light" />
             </Pressable>
 
-            <Pressable
-              className="flex-1 h-12 items-center justify-center rounded-full bg-green-base active:opacity-80"
+            <Button
               onPress={handleSubmit(onSubmit)}
               disabled={isSubmitting}
             >
@@ -259,7 +259,7 @@ export function EditExpenseFormModal({
                   Salvar
                 </Text>
               )}
-            </Pressable>
+            </Button>
           </View>
         </Pressable>
       </Pressable>

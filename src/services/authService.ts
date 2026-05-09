@@ -32,10 +32,8 @@ export const authService = {
     return response.data;
   },
 
-  async listUsers(activityId?: string): Promise<UserListResponse> {
-    const response = await api.get<UserListResponse>('/users', {
-      params: activityId ? { activityId } : {},
-    });
+  async listUsers(): Promise<UserListResponse> {
+    const response = await api.get<UserListResponse>('/users');
     return response.data;
   },
 

@@ -38,7 +38,7 @@ type CreateExpenseModalProps = {
 
 export function CreateExpenseModal({ visible, activityId, onClose }: CreateExpenseModalProps) {
   const dispatch = useAppDispatch();
-  const { current: activity } = useAppSelector((state) => state.activities);
+  const { users } = useAppSelector((state) => state.auth);
   const { error } = useAppSelector((state) => state.expenses);
   const { control, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<FormData>({
     resolver: yupResolver(schema),
@@ -85,10 +85,10 @@ export function CreateExpenseModal({ visible, activityId, onClose }: CreateExpen
     dispatch(clearError());
   }
 
-  const participantOptions: SelectOption[] = (activity?.participants ?? []).map((p) => ({
-    id: p.id,
-    name: p.name,
-    initials: p.name.substring(0, 2).toUpperCase(),
+  const participantOptions: SelectOption[] = (users ?? []).map((p) => ({
+    id: p?.id ?? "",
+    name: p?.name ?? "",
+    initials: p?.name.substring(0, 2).toUpperCase() ?? "",
   }));
 
   return (

@@ -9,6 +9,7 @@ import { fetchActivityById, clearCurrent, fetchActivities } from "../store/activ
 import { fetchExpensesByActivity, fetchExpenseById, clearCurrent as clearExpenseCurrent } from "../store/expensesSlice";
 import { Button, ExpenseCard, CreateExpenseModal, EditActivityModal, EditExpenseModal, EditExpenseFormModal } from "../components";
 import type { ExpenseDetailResponse } from "../services/types";
+import { listUsers } from '../store/authSlice';
 
 cssInterop(MCI, {
   className: {
@@ -88,6 +89,7 @@ export default function ExpensesScreen({ route, navigation }: ExpensesScreenProp
   }, [dispatch, activityId]);
 
   useEffect(() => {
+    dispatch(listUsers());
     if (user?.id) {
       dispatch(fetchActivities(user.id));
     }

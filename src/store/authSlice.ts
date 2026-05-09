@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { authService } from "../services";
 import type { SignInRequest, SignUpRequest } from "../services/types";
+import { fetchActivities } from './activitiesSlice';
 
 interface AuthState {
   token: string | null;
@@ -10,8 +11,10 @@ interface AuthState {
     email: string;
     name: string;
   } | null;
+  users: AuthState["user"][];
   loading: boolean;
   initialized: boolean;
+  error: string | null;
   loginError: string | null;
   signupError: string | null;
 }
@@ -19,9 +22,11 @@ interface AuthState {
 const initialState: AuthState = {
   token: null,
   user: null,
+  users: [],
   loading: false,
   initialized: false,
   loginError: null,
+  error: null,
   signupError: null,
 };
 
@@ -85,6 +90,18 @@ export const signOut = createAsyncThunk("auth/signOut", async () => {
   await authService.signOut();
 });
 
+export const listUsers = createAsyncThunk(
+  "auth/listUsers",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await authService.listUsers();
+      return response.users;
+    } catch (err: any) {
+      return rejectWithValue(extractErrorMessage(err, "Erro ao buscar usuários"));
+    }
+  }
+);
+
 const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -102,6 +119,7 @@ const authSlice = createSlice({
         state.loading = true;
         state.loginError = null;
         state.signupError = null;
+        state.error = null;
       })
       .addCase(checkStoredAuth.fulfilled, (state, action) => {
         state.loading = false;
@@ -150,6 +168,20 @@ const authSlice = createSlice({
         state.loading = false;
         state.loginError = null;
         state.signupError = null;
+        state.error = null;
+      })
+
+      .addCase(listUsers.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(listUsers.fulfilled, (state, action) => {
+        state.loading = false;
+        state.users = action.payload;
+      })
+      .addCase(listUsers.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
       });
   },
 });
