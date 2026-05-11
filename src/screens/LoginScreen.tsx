@@ -67,8 +67,8 @@ export default function LoginScreen() {
             <View className="h-96 justify-center items-center">
               <Logo width={64} height={64} />
               <View className="flex-row mt-2">
-                <Text className="font-heading-lg text-green-base">TaskCost</Text>
-                <Text className="font-heading-sm text-green-light"> Split</Text>
+                <Text className="font-heading-lg text-green-base">Cost</Text>
+                <Text className="font-heading-sm text-green-light">Sharing</Text>
               </View>
             </View>
 

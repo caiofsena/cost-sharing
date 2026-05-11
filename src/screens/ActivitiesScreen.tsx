@@ -74,7 +74,7 @@ export default function ActivitiesScreen({ navigation }: any) {
       <View className="px-6 pt-4 pb-4">
         <View className="mb-4 flex-row items-center">
           <Logo width={17} height={17} />
-          <Text className="ml-2 font-heading-lg text-green-base">TaskCost</Text>
+          <Text className="ml-2 font-heading-lg text-green-base">Cost Sharing</Text>
           <Text className="font-heading-sm text-green-light"> Split</Text>
         </View>
         <Text className="mb-1 font-heading-lg text-heading-lg text-gray-100">
