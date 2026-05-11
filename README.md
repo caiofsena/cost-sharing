@@ -1,4 +1,4 @@
-# TaskCost Split
+# Cost Sharing
 
 Aplicativo React Native para divisão de despesas entre participantes de atividades compartilhadas. Gerencie atividades, registre despesas, acompanhe saldos e controle quem pagou o quê.
 
