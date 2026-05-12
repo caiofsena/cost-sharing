@@ -7,7 +7,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 
 import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { fetchActivityById } from "../store/activitiesSlice";
+import { fetchActivityById, fetchActivities } from "../store/activitiesSlice";
 import { updateExpense, deleteExpense } from "../store/expensesSlice";
 import { Select, type SelectOption } from "./Select";
 import { Button } from './Button';
@@ -53,6 +53,7 @@ export function EditExpenseFormModal({
 }: EditExpenseFormModalProps) {
   const dispatch = useAppDispatch();
   const { current: activity } = useAppSelector((state) => state.activities);
+  const { user } = useAppSelector((state) => state.auth);
   const { control, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<FormData>({
     resolver: yupResolver(schema),
     defaultValues: {
@@ -94,6 +95,7 @@ export function EditExpenseFormModal({
         },
       })).unwrap();
       dispatch(fetchActivityById(activityId));
+      if (user?.id) dispatch(fetchActivities(user.id));
       onClose();
     } catch {
     }
@@ -112,6 +114,7 @@ export function EditExpenseFormModal({
             try {
               await dispatch(deleteExpense(expenseId)).unwrap();
               dispatch(fetchActivityById(activityId));
+              if (user?.id) dispatch(fetchActivities(user.id));
               onClose();
             } catch {
             }

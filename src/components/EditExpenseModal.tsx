@@ -3,8 +3,8 @@ import { ActivityIndicator, Alert, Modal, Pressable, Text, View } from "react-na
 import MCI from "@expo/vector-icons/MaterialCommunityIcons";
 import { cssInterop } from "nativewind";
 
-import { useAppDispatch } from "../store/hooks";
-import { fetchActivityById } from "../store/activitiesSlice";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { fetchActivityById, fetchActivities } from "../store/activitiesSlice";
 import { deleteExpense, toggleParticipantPayment } from "../store/expensesSlice";
 import { StatusSelect } from "./StatusSelect";
 import type { ExpenseDetailResponse } from "../services/types";
@@ -40,6 +40,7 @@ export function EditExpenseModal({
   onToggleSuccess,
 }: EditExpenseModalProps) {
   const dispatch = useAppDispatch();
+  const { user } = useAppSelector((state) => state.auth);
   const [toggling, setToggling] = useState<string | null>(null);
 
   const totalFormatted = (expense.amountInCents / 100).toLocaleString("pt-BR", {
@@ -63,6 +64,7 @@ export function EditExpenseModal({
     try {
       await dispatch(toggleParticipantPayment({ expenseId: expense.id, participantId })).unwrap();
       dispatch(fetchActivityById(activityId));
+      if (user?.id) dispatch(fetchActivities(user.id));
       onToggleSuccess?.();
     } catch {
     } finally {
@@ -83,6 +85,7 @@ export function EditExpenseModal({
             try {
               await dispatch(deleteExpense(expense.id)).unwrap();
               dispatch(fetchActivityById(activityId));
+              if (user?.id) dispatch(fetchActivities(user.id));
               onClose();
             } catch {
             }

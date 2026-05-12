@@ -7,7 +7,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 
 import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { fetchActivityById } from "../store/activitiesSlice";
+import { fetchActivityById, fetchActivities } from "../store/activitiesSlice";
 import { createExpense } from "../store/expensesSlice";
 import { Select, type SelectOption } from "./Select";
 
@@ -40,6 +40,7 @@ type CreateExpenseModalProps = {
 export function CreateExpenseModal({ visible, activityId, onClose }: CreateExpenseModalProps) {
   const dispatch = useAppDispatch();
   const { current: activity } = useAppSelector((state) => state.activities);
+  const { user } = useAppSelector((state) => state.auth);
   const { control, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<FormData>({
     resolver: yupResolver(schema),
     defaultValues: {
@@ -73,6 +74,7 @@ export function CreateExpenseModal({ visible, activityId, onClose }: CreateExpen
         },
       })).unwrap();
       dispatch(fetchActivityById(activityId));
+      if (user?.id) dispatch(fetchActivities(user.id));
       onClose();
     } catch {
     }
