@@ -28,7 +28,7 @@ type AuthStackParamList = {
 };
 
 type ActivitiesStackParamList = {
-  Activities: undefined;
+  ActivitiesList: undefined;
   Expenses: { activityId: string };
 };
 
@@ -63,7 +63,7 @@ function AuthNavigator() {
 function ActivitiesStackScreen() {
   return (
     <ActivitiesStack.Navigator screenOptions={{ headerShown: false }}>
-      <ActivitiesStack.Screen name="Activities" component={ActivitiesScreen} />
+      <ActivitiesStack.Screen name="ActivitiesList" component={ActivitiesScreen} />
       <ActivitiesStack.Screen name="Expenses" component={ExpensesScreen} />
     </ActivitiesStack.Navigator>
   );
