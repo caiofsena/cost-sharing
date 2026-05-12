@@ -1,21 +1,29 @@
-import { useEffect } from "react";
-import { ActivityIndicator, FlatList, Text, View } from "react-native";
+import { useEffect, useState } from "react";
+import { ActivityIndicator, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Logo from "../../assets/logo.svg";
+import MCI from "@expo/vector-icons/MaterialCommunityIcons";
+import { cssInterop } from "nativewind";
 
 import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { fetchGlobalBalance, fetchDetailedBalance } from "../store/balanceSlice";
+import { fetchUserStatistics } from "../store/balanceSlice";
+import { Button, CreateActivityModal } from '../components';
+
+cssInterop(MCI, {
+  className: {
+    target: "style",
+  },
+});
 
 export default function ResumeScreen() {
   const dispatch = useAppDispatch();
+  const { statistics, loading } = useAppSelector((state) => state.balance);
   const { user } = useAppSelector((state) => state.auth);
-  const { globalBalance, detailedBalance, loading } = useAppSelector((state) => state.balance);
+  const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
-    if (user?.id) {
-      dispatch(fetchGlobalBalance(user.id));
-      dispatch(fetchDetailedBalance(user.id));
-    }
-  }, [dispatch, user?.id]);
+    dispatch(fetchUserStatistics());
+  }, [dispatch]);
 
   if (loading) {
     return (
@@ -25,101 +33,151 @@ export default function ResumeScreen() {
     );
   }
 
-  const globalNet = (globalBalance?.globalNetBalanceInCents ?? 0) / 100;
-  const globalFormatted = globalNet.toLocaleString("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  });
+  const paidAmount = (statistics?.amountPaidInCents ?? 0) / 100;
+  const pendingAmount = (statistics?.amountToPayInCents ?? 0) / 100;
+  const totalAmount = (statistics?.totalExpensesAmountInCents ?? 0) / 100;
 
-  const totalOwes = (detailedBalance?.totalUserOwesInCents ?? 0) / 100;
-  const totalOwed = (detailedBalance?.totalOwedToUserInCents ?? 0) / 100;
+  const paidFormatted = paidAmount.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  const pendingFormatted = pendingAmount.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  const totalFormatted = totalAmount.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
+  const paidCount = statistics?.paidExpensesCount ?? 0;
+  const pendingCount = statistics?.expensesToPayCount ?? 0;
+  const activitiesCount = statistics?.activitiesCount ?? 0;
+  const expensesCount = statistics?.expensesCount ?? 0;
+  const participantsCount = statistics?.uniqueParticipantsCount ?? 0;
+
+  function EmptyState() {
+  return (
+    <View className="flex-1 items-center justify-center px-8">
+      <View className="mb-6 h-24 w-24 items-center justify-center rounded-full bg-gray-700">
+        <MCI name="clipboard-text-outline" size={48} className="color-gray-400" />
+      </View>
+      <Text className="mb-6 text-center font-label-md text-label-md text-gray-300">
+        Você ainda não tem atividades criadas
+      </Text>
+      <Button onPress={() => setModalVisible(true)} hasIconLeft>
+        <Text className="font-label-sm text-label-sm text-gray-800">Criar atividade</Text>
+      </Button>
+    </View>
+  );
+}
 
   return (
     <SafeAreaView className="flex-1 bg-gray-800">
-      <View className="px-6 pt-4 pb-4">
+      <View className="px-6 pt-4 pb-6">
+        <View className="flex-row items-center mb-4">
+          <Logo width={17} height={17} />
+          <Text className="font-heading-lg text-green-base ml-2">Cost</Text>
+          <Text className="font-heading-sm text-green-light">Sharing</Text>
+        </View>
         <Text className="font-heading-lg text-heading-lg text-gray-100">
           Resumo
         </Text>
-        <Text className="font-text-sm text-text-sm text-gray-400">
-          Visão geral das suas finanças
+        <Text className="mt-1 font-text-sm text-text-sm text-gray-300">
+          Acompanhe as informações principais sobre suas atividades
         </Text>
       </View>
+      <View className='flex-1'>
+        {activitiesCount === 0 ? (
+          <EmptyState />
+        ) : (
+          <ScrollView showsVerticalScrollIndicator={false} contentContainerClassName="px-6 pb-8">
+            <Text className="font-label-md text-label-md text-gray-100 mb-3">
+              Minhas contas
+            </Text>
+            <View className="rounded-2xl bg-gray-800 border border-gray-600 p-5 mb-3 flex-row items-center gap-4">
+              <View className="h-12 w-12 items-center justify-center rounded-xl bg-green-900">
+                <MCI name="check" size={24} className="color-green-base" />
+              </View>
+              <View className="flex-1">
+                <Text className="font-heading-lg text-heading-lg text-gray-100">
+                  {paidFormatted}
+                </Text>
+                <Text className="font-text-sm text-text-sm text-gray-400">
+                  Pago em {paidCount} {paidCount === 1 ? "despesa" : "despesas"}
+                </Text>
+              </View>
+            </View>
 
-      <View className="mx-6 mb-6 rounded-2xl bg-gray-700 border border-gray-500 p-6">
-        <Text className="font-label-sm text-label-sm text-gray-400">
-          Saldo global
-        </Text>
-        <Text
-          className={`mt-2 font-heading-xl text-heading-xl ${globalNet >= 0 ? "text-green-base" : "text-danger-light"}`}
-        >
-          {globalNet >= 0 ? "+" : ""}
-          {globalFormatted}
-        </Text>
-      </View>
+            <View className="rounded-2xl bg-gray-800 border border-gray-600 p-5 mb-6 flex-row items-center gap-4">
+              <View className="h-12 w-12 items-center justify-center rounded-xl bg-danger-low">
+                <MCI name="alert-octagon-outline" size={24} className="color-danger-light" />
+              </View>
+              <View className="flex-1">
+                <Text className="font-heading-lg text-heading-lg text-gray-100">
+                  {pendingFormatted}
+                </Text>
+                <Text className="font-text-sm text-text-sm text-gray-400">
+                  Pendente em {pendingCount} {pendingCount === 1 ? "despesa" : "despesas"}
+                </Text>
+              </View>
+            </View>
 
-      <View className="flex-row gap-4 px-6 mb-6">
-        <View className="flex-1 rounded-xl bg-gray-700 border border-gray-500 p-4">
-          <Text className="font-label-xs text-label-xs text-gray-400">
-            Você deve
-          </Text>
-          <Text className="mt-1 font-label-md text-label-md text-danger-light">
-            {totalOwes.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
-          </Text>
-        </View>
-        <View className="flex-1 rounded-xl bg-gray-700 border border-gray-500 p-4">
-          <Text className="font-label-xs text-label-xs text-gray-400">
-            Devem a você
-          </Text>
-          <Text className="mt-1 font-label-md text-label-md text-green-base">
-            {totalOwed.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
-          </Text>
-        </View>
-      </View>
+            <Text className="font-label-md text-label-md text-gray-100 mb-3">
+              Informações gerais
+            </Text>
 
-      {detailedBalance && (detailedBalance.debts.length > 0 || detailedBalance.credits.length > 0) ? (
-        <View className="flex-1 px-6">
-          <Text className="mb-3 font-label-md text-label-md text-gray-300">
-            Detalhes
-          </Text>
-          <FlatList
-            data={[
-              ...detailedBalance.debts.map((d) => ({ ...d, type: "debt" as const })),
-              ...detailedBalance.credits.map((c) => ({ ...c, type: "credit" as const })),
-            ]}
-            keyExtractor={(item, idx) => `${item.type}-${item.activityId}-${item.expenseId}-${idx}`}
-            renderItem={({ item }) => (
-              <View className="mb-3 rounded-xl bg-gray-700 border border-gray-500 p-4">
-                <View className="flex-row items-center justify-between">
-                  <View>
-                    <Text className="font-label-sm text-label-sm text-gray-100">
-                      {item.type === "debt" ? "Você deve para" : "Deve para você"}{" "}
-                      {item.type === "debt" ? item.creditorName : item.debtorName}
-                    </Text>
-                    <Text className="font-text-xs text-text-xs text-gray-400">
-                      {item.activityName}
-                    </Text>
-                  </View>
-                  <Text
-                    className={`font-label-md text-label-md ${item.type === "debt" ? "text-danger-light" : "text-green-base"}`}
-                  >
-                    {(item.amountInCents / 100).toLocaleString("pt-BR", {
-                      style: "currency",
-                      currency: "BRL",
-                    })}
+            <View className="rounded-2xl bg-gray-800 border border-gray-600 p-5 mb-4 flex-row items-center gap-4">
+              <View className="h-12 w-12 items-center justify-center rounded-xl bg-gray-700">
+                <MCI name="clock-outline" size={20} className="color-green-light" />
+              </View>
+              <View className="flex-1">
+                <Text className="font-heading-lg text-heading-lg text-gray-100">
+                  {totalFormatted}
+                </Text>
+                <Text className="font-text-sm text-text-sm text-gray-400">
+                  Total de despesas
+                </Text>
+              </View>
+              <View className="w-10" />
+            </View>
+
+            <View className="flex-row gap-2">
+              <View className="flex-1 flex-row rounded-2xl bg-gray-800 border border-gray-600 p-3 justify-center">
+                <View>
+                  <Text className="font-heading-lg text-heading-lg text-gray-200 mt-1">
+                    {activitiesCount}
+                  </Text>
+                  <Text className="font-text-xs text-text-xs text-gray-400 mt-4">
+                    Atividades
                   </Text>
                 </View>
+                <MCI name="format-list-bulleted" size={18} className="color-green-light" />
               </View>
-            )}
-            showsVerticalScrollIndicator={false}
-          />
-        </View>
-      ) : (
-        <View className="flex-1 items-center justify-center px-8">
-          <Text className="text-center font-label-md text-label-md text-gray-400">
-            Nenhuma transação registrada
-          </Text>
-        </View>
-      )}
+
+              <View className="flex-1 flex-row rounded-2xl bg-gray-800 border border-gray-600 p-2 justify-between">
+                <View>
+                  <Text className="font-heading-lg text-heading-lg text-gray-200 mt-1">
+                    {expensesCount}
+                  </Text>
+                  <Text className="font-text-xs text-text-xs text-gray-400 mt-4">
+                    Despesas
+                  </Text>
+                </View>
+                <MCI name="currency-usd" size={18} className="color-green-light" />
+              </View>
+
+              <View className="flex-1 flex-row rounded-2xl bg-gray-800 border border-gray-600 p-2 justify-between">
+                <View>
+                  <Text className="font-heading-lg text-heading-lg text-gray-200 mt-1">
+                    {participantsCount}
+                  </Text>
+                  <Text className="font-text-xs text-text-xs text-gray-400 mt-4">
+                    Participantes
+                  </Text>
+                </View>
+                <MCI name="account-group" size={18} className="color-green-light" />
+              </View>
+            </View>
+        </ScrollView>
+        )}
+      </View>
+      <CreateActivityModal
+        visible={modalVisible}
+        userId={user?.id ?? ""}
+        onClose={() => setModalVisible(false)}
+      />
     </SafeAreaView>
   );
 }

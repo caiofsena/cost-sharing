@@ -89,8 +89,8 @@ function HomeTabs() {
         component={HomeScreen}
         options={{
           tabBarLabel: "Home",
-          tabBarIcon: ({ color }: { color: string }) => (
-            <Text style={{ color, fontSize: 20 }}>🏠</Text>
+          tabBarIcon: ({ focused }: { focused: boolean }) => (
+            <MCI name="home" size={24} className={focused ? "color-green-base" : "color-gray-400"} />
           ),
         }}
       />
@@ -110,7 +110,7 @@ function HomeTabs() {
         options={{
           tabBarLabel: "Resumo",
           tabBarIcon: ({ focused }: { focused: boolean }) => (
-            <MCI name="chart-pie-outline" size={24} className={focused ? "color-green-base" : "color-gray-400"} />
+            <MCI name="chart-pie" size={24} className={focused ? "color-green-base" : "color-gray-400"} />
           ),
         }}
       />
@@ -124,7 +124,7 @@ function HomeTabs() {
           ),
         }}
       />
-      <Tab.Screen
+      {/* <Tab.Screen
         name="Components"
         component={ComponentsScreen}
         options={{
@@ -133,7 +133,7 @@ function HomeTabs() {
             <Text style={{ color, fontSize: 20 }}>🧩</Text>
           ),
         }}
-      />
+      /> */}
     </Tab.Navigator>
   );
 }

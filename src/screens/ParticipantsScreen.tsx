@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, FlatList, Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Logo from "../../assets/logo.svg";
 import MCI from "@expo/vector-icons/MaterialCommunityIcons";
 import { cssInterop } from "nativewind";
 
@@ -69,17 +70,22 @@ export default function ParticipantsScreen() {
   return (
     <SafeAreaView className="flex-1 bg-gray-800">
       <View className="px-6 pt-4 pb-4">
-        <Text className="font-heading-lg text-heading-lg text-gray-100">
+        <View className="mb-4 flex-row items-center">
+          <Logo width={17} height={17} />
+          <Text className="font-heading-lg text-green-base ml-2">Cost</Text>
+          <Text className="font-heading-sm text-green-light">Sharing</Text>
+        </View>
+        <Text className="mt-1 font-heading-lg text-heading-lg text-gray-100">
           Participantes
         </Text>
-        <Text className="font-text-sm text-text-sm text-gray-400">
+        <Text className="mt-1 font-text-sm text-text-sm text-gray-400">
           Gerencie quem está nas suas atividades
         </Text>
       </View>
 
       <View className="px-6 mb-4">
         <Text className="mb-2 font-label-sm text-label-sm text-gray-300">
-          Atividade
+          Atividades
         </Text>
         <FlatList
           horizontal
@@ -110,7 +116,7 @@ export default function ParticipantsScreen() {
 
       {selectedActivityId ? (
         <>
-          <View className="px-6 mb-4 flex-row items-center justify-between">
+          <View className="mt-2 px-6 mb-4 flex-row items-center justify-between">
             <Text className="font-label-md text-label-md text-gray-300">
               {activityName}
             </Text>

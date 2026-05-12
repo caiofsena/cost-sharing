@@ -1,10 +1,11 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { balanceService } from "../services";
+import { balanceService, authService } from "../services";
 import type {
   ActivityBalanceResponse,
   UserGlobalBalanceResponse,
   DetailedBalanceResponse,
   BalanceBetweenUsersResponse,
+  UserExpenseStatisticsResponse,
 } from "../services/types";
 
 interface BalanceState {
@@ -12,6 +13,7 @@ interface BalanceState {
   globalBalance: UserGlobalBalanceResponse | null;
   detailedBalance: DetailedBalanceResponse | null;
   betweenUsers: BalanceBetweenUsersResponse | null;
+  statistics: UserExpenseStatisticsResponse | null;
   loading: boolean;
   error: string | null;
 }
@@ -21,6 +23,7 @@ const initialState: BalanceState = {
   globalBalance: null,
   detailedBalance: null,
   betweenUsers: null,
+  statistics: null,
   loading: false,
   error: null,
 };
@@ -76,6 +79,17 @@ export const fetchBalanceBetweenUsers = createAsyncThunk(
       return await balanceService.getBalanceBetweenUsers(userId1, userId2);
     } catch (err: any) {
       return rejectWithValue(extractErrorMessage(err, "Erro ao buscar balanço entre usuários"));
+    }
+  }
+);
+
+export const fetchUserStatistics = createAsyncThunk(
+  "balance/fetchStatistics",
+  async (_, { rejectWithValue }) => {
+    try {
+      return await authService.getStatistics();
+    } catch (err: any) {
+      return rejectWithValue(extractErrorMessage(err, "Erro ao buscar estatísticas"));
     }
   }
 );
@@ -138,6 +152,19 @@ const balanceSlice = createSlice({
         state.betweenUsers = action.payload;
       })
       .addCase(fetchBalanceBetweenUsers.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+
+      .addCase(fetchUserStatistics.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchUserStatistics.fulfilled, (state, action) => {
+        state.loading = false;
+        state.statistics = action.payload;
+      })
+      .addCase(fetchUserStatistics.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });

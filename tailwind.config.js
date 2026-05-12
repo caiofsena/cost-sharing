@@ -43,8 +43,6 @@ module.exports = {
         'text-md': ['Inter_400Regular', 'sans-serif'],
         'text-sm': ['Inter_400Regular', 'sans-serif'],
         'text-xs': ['Inter_400Regular', 'sans-serif'],
-        'heading-lg': ['Sora_700Bold', 'sans-serif'],
-        'heading-sm': ['Sora_700Bold', 'sans-serif'],
       },
       fontSize: {
         'heading-lg': ['20px', { lineHeight: '130%', fontWeight: '700' }],

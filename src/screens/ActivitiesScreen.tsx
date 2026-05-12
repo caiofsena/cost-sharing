@@ -74,13 +74,13 @@ export default function ActivitiesScreen({ navigation }: any) {
       <View className="px-6 pt-4 pb-4">
         <View className="mb-4 flex-row items-center">
           <Logo width={17} height={17} />
-          <Text className="ml-2 font-heading-lg text-green-base">Cost Sharing</Text>
-          <Text className="font-heading-sm text-green-light"> Split</Text>
+          <Text className="font-heading-lg text-green-base ml-2">Cost</Text>
+          <Text className="font-heading-sm text-green-light">Sharing</Text>
         </View>
-        <Text className="mb-1 font-heading-lg text-heading-lg text-gray-100">
+        <Text className="mt-1 font-heading-lg text-heading-lg text-gray-100">
           Atividades
         </Text>
-        <Text className="font-text-sm text-text-sm text-gray-400">
+        <Text className="mt-1 font-text-sm text-text-sm text-gray-400">
           Organize suas despesas divididas
         </Text>
       </View>
