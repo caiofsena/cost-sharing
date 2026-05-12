@@ -293,6 +293,13 @@ export default function ExpensesScreen({ route, navigation }: ExpensesScreenProp
             setSelectedExpense(null);
           }}
           onEdit={handleOpenEditExpenseForm}
+          onToggleSuccess={async () => {
+            try {
+              const result = await dispatch(fetchExpenseById(selectedExpense.id)).unwrap();
+              setSelectedExpense(result);
+            } catch {
+            }
+          }}
         />
       )}
 

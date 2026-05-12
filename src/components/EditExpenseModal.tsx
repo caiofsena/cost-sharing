@@ -28,6 +28,7 @@ type EditExpenseModalProps = {
   activityId: string;
   onClose: () => void;
   onEdit: () => void;
+  onToggleSuccess?: () => void;
 };
 
 export function EditExpenseModal({
@@ -36,6 +37,7 @@ export function EditExpenseModal({
   activityId,
   onClose,
   onEdit,
+  onToggleSuccess,
 }: EditExpenseModalProps) {
   const dispatch = useAppDispatch();
   const [toggling, setToggling] = useState<string | null>(null);
@@ -61,6 +63,7 @@ export function EditExpenseModal({
     try {
       await dispatch(toggleParticipantPayment({ expenseId: expense.id, participantId })).unwrap();
       dispatch(fetchActivityById(activityId));
+      onToggleSuccess?.();
     } catch {
     } finally {
       setToggling(null);
