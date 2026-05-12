@@ -78,6 +78,8 @@ export function EditExpenseFormModal({
         amount: (initialAmountInCents / 100).toFixed(2).replace(".", ","),
       });
       setSelectedParticipants(participantOptions);
+    } else {
+      setSelectedParticipants([]);
     }
   }, [visible, initialTitle, initialAmountInCents, initialParticipantIds, activity, reset]);
 
@@ -97,7 +99,8 @@ export function EditExpenseFormModal({
       dispatch(fetchActivityById(activityId));
       if (user?.id) dispatch(fetchActivities(user.id));
       onClose();
-    } catch {
+    } catch (err) {
+      console.error("Failed to update expense:", err);
     }
   }
 
@@ -116,7 +119,8 @@ export function EditExpenseFormModal({
               dispatch(fetchActivityById(activityId));
               if (user?.id) dispatch(fetchActivities(user.id));
               onClose();
-            } catch {
+            } catch (err) {
+              console.error("Failed to delete expense:", err);
             }
           },
         },

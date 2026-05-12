@@ -71,7 +71,8 @@ export function EditActivityModal({
       })).unwrap();
       dispatch(fetchActivities(userId));
       onClose();
-    } catch {
+    } catch (err) {
+      console.error("Failed to update activity:", err);
     }
   }
 
@@ -89,7 +90,8 @@ export function EditActivityModal({
               await dispatch(deleteActivity(activityId)).unwrap();
               dispatch(fetchActivities(userId));
               onDelete();
-            } catch {
+            } catch (err) {
+              console.error("Failed to delete activity:", err);
             }
           },
         },

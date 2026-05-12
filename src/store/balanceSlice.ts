@@ -28,14 +28,14 @@ const initialState: BalanceState = {
   error: null,
 };
 
-function extractErrorMessage(err: any, fallback: string): string {
-  const data = err?.response?.data;
+function extractErrorMessage(err: unknown, fallback: string): string {
+  const data = (err as { response?: { data?: unknown } })?.response?.data;
   if (typeof data === "string") return data;
-  if (data?.reason) return data.reason;
-  if (data?.message) return data.message;
-  if (data?.error) return data.error;
-  if (Array.isArray(data?.errors) && data.errors.length > 0) return data.errors[0];
-  if (err?.message) return err.message;
+  if (data && typeof data === "object" && "reason" in data) return (data as { reason: string }).reason;
+  if (data && typeof data === "object" && "message" in data) return (data as { message: string }).message;
+  if (data && typeof data === "object" && "error" in data) return (data as { error: string }).error;
+  if (data && typeof data === "object" && "errors" in data && Array.isArray((data as { errors: unknown }).errors) && (data as { errors: string[] }).errors.length > 0) return (data as { errors: string[] }).errors[0];
+  if (err && typeof err === "object" && "message" in err) return (err as { message: string }).message;
   return fallback;
 }
 
@@ -44,7 +44,7 @@ export const fetchActivityBalance = createAsyncThunk(
   async (activityId: string, { rejectWithValue }) => {
     try {
       return await balanceService.getActivityBalance(activityId);
-    } catch (err: any) {
+    } catch (err: unknown) {
       return rejectWithValue(extractErrorMessage(err, "Erro ao buscar balanço da atividade"));
     }
   }
@@ -55,7 +55,7 @@ export const fetchGlobalBalance = createAsyncThunk(
   async (userId: string, { rejectWithValue }) => {
     try {
       return await balanceService.getUserGlobalBalance(userId);
-    } catch (err: any) {
+    } catch (err: unknown) {
       return rejectWithValue(extractErrorMessage(err, "Erro ao buscar balanço global"));
     }
   }
@@ -66,7 +66,7 @@ export const fetchDetailedBalance = createAsyncThunk(
   async (userId: string, { rejectWithValue }) => {
     try {
       return await balanceService.getUserDetailedBalance(userId);
-    } catch (err: any) {
+    } catch (err: unknown) {
       return rejectWithValue(extractErrorMessage(err, "Erro ao buscar balanço detalhado"));
     }
   }
@@ -77,7 +77,7 @@ export const fetchBalanceBetweenUsers = createAsyncThunk(
   async ({ userId1, userId2 }: { userId1: string; userId2: string }, { rejectWithValue }) => {
     try {
       return await balanceService.getBalanceBetweenUsers(userId1, userId2);
-    } catch (err: any) {
+    } catch (err: unknown) {
       return rejectWithValue(extractErrorMessage(err, "Erro ao buscar balanço entre usuários"));
     }
   }
@@ -88,7 +88,7 @@ export const fetchUserStatistics = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       return await authService.getStatistics();
-    } catch (err: any) {
+    } catch (err: unknown) {
       return rejectWithValue(extractErrorMessage(err, "Erro ao buscar estatísticas"));
     }
   }

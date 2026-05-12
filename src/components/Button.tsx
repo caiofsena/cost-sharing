@@ -1,4 +1,4 @@
-import { Pressable, Text, type PressableProps } from "react-native";
+import { Pressable, type PressableProps } from "react-native";
 import { tv, type VariantProps } from "tailwind-variants";
 
 import MCI from "@expo/vector-icons/MaterialCommunityIcons";

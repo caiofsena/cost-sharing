@@ -2,19 +2,17 @@ import { useEffect, useState } from "react";
 import { ActivityIndicator, FlatList, Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MCI from "@expo/vector-icons/MaterialCommunityIcons";
-import { cssInterop } from "nativewind";
 
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { fetchActivityById, clearCurrent, fetchActivities } from "../store/activitiesSlice";
 import { fetchExpenseById, clearCurrent as clearExpenseCurrent } from "../store/expensesSlice";
 import { Button, ExpenseCard, CreateExpenseModal, EditActivityModal, EditExpenseModal, EditExpenseFormModal } from "../components";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import type { ActivityDetailResponseExpenseInfo, ExpenseDetailResponse } from "../services/types";
 
-cssInterop(MCI, {
-  className: {
-    target: "style",
-  },
-});
+type ExpensesStackParamList = {
+  Expenses: { activityId: string };
+};
 
 type ExpensesScreenProps = {
   route: {
@@ -22,7 +20,7 @@ type ExpensesScreenProps = {
       activityId: string;
     };
   };
-  navigation: any;
+  navigation: NativeStackNavigationProp<ExpensesStackParamList, "Expenses">;
 };
 
 function getInitials(name: string): string {
@@ -119,7 +117,8 @@ export default function ExpensesScreen({ route, navigation }: ExpensesScreenProp
       const result = await dispatch(fetchExpenseById(expenseId)).unwrap();
       setSelectedExpense(result);
       setEditExpenseModalVisible(true);
-    } catch {
+    } catch (err) {
+      console.error("Failed to fetch expense:", err);
     }
   }
 
@@ -297,7 +296,8 @@ export default function ExpensesScreen({ route, navigation }: ExpensesScreenProp
             try {
               const result = await dispatch(fetchExpenseById(selectedExpense.id)).unwrap();
               setSelectedExpense(result);
-            } catch {
+            } catch (err) {
+              console.error("Failed to fetch expense for toggle:", err);
             }
           }}
         />

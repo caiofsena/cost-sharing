@@ -5,6 +5,7 @@ import Logo from "../../assets/logo.svg";
 import MCI from "@expo/vector-icons/MaterialCommunityIcons";
 import { cssInterop } from "nativewind";
 
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { fetchActivities } from "../store/activitiesSlice";
 import { ActivityCard, Button, CreateActivityModal } from "../components";
@@ -49,7 +50,11 @@ function ActivityItem({ item, onPress }: { item: { id: string; name: string; act
   );
 }
 
-export default function ActivitiesScreen({ navigation }: any) {
+type ActivitiesStackParamList = {
+  Expenses: { activityId: string };
+};
+
+export default function ActivitiesScreen({ navigation }: { navigation: NativeStackNavigationProp<ActivitiesStackParamList> }) {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
   const { items, loading } = useAppSelector((state) => state.activities);

@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { useState } from "react";
 import { ScrollView, Text, View } from "react-native";
 
@@ -112,7 +113,7 @@ export default function ComponentsScreen() {
   );
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <View className="gap-4">
       <Text className="font-heading-sm text-heading-sm text-gray-100">{title}</Text>

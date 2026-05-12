@@ -4,7 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import MCI from "@expo/vector-icons/MaterialCommunityIcons";
 import { cssInterop } from "nativewind";
 
-import { useAppSelector } from "../store/hooks";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { activitiesService } from "../services";
 
 cssInterop(MCI, {
@@ -13,8 +13,11 @@ cssInterop(MCI, {
   },
 });
 
-export default function CreateActivityScreen({ navigation }: any) {
-  const { user } = useAppSelector((state) => state.auth);
+type AuthStackParamList = {
+  CreateActivity: undefined;
+};
+
+export default function CreateActivityScreen({ navigation }: { navigation: NativeStackNavigationProp<AuthStackParamList> }) {
   const [title, setTitle] = useState("");
   const [activityDate, setActivityDate] = useState(new Date().toISOString().split("T")[0]);
   const [loading, setLoading] = useState(false);
@@ -36,8 +39,9 @@ export default function CreateActivityScreen({ navigation }: any) {
         activityDate: new Date(activityDate).toISOString(),
       });
       navigation.goBack();
-    } catch (err: any) {
-      setError(err?.response?.data?.message || "Erro ao criar atividade");
+    } catch (err: unknown) {
+      const message = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      setError(message || "Erro ao criar atividade");
     } finally {
       setLoading(false);
     }

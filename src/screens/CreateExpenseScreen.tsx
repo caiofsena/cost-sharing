@@ -2,15 +2,13 @@ import { useState } from "react";
 import { ActivityIndicator, Pressable, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MCI from "@expo/vector-icons/MaterialCommunityIcons";
-import { cssInterop } from "nativewind";
 
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { expensesService } from "../services";
 
-cssInterop(MCI, {
-  className: {
-    target: "style",
-  },
-});
+type ExpensesStackParamList = {
+  CreateExpense: { activityId: string };
+};
 
 type CreateExpenseScreenProps = {
   route: {
@@ -18,7 +16,7 @@ type CreateExpenseScreenProps = {
       activityId: string;
     };
   };
-  navigation: any;
+  navigation: NativeStackNavigationProp<ExpensesStackParamList>;
 };
 
 export default function CreateExpenseScreen({ route, navigation }: CreateExpenseScreenProps) {
@@ -51,8 +49,9 @@ export default function CreateExpenseScreen({ route, navigation }: CreateExpense
         participantsIds: [],
       });
       navigation.goBack();
-    } catch (err: any) {
-      setError(err?.response?.data?.message || "Erro ao criar despesa");
+    } catch (err: unknown) {
+      const message = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      setError(message || "Erro ao criar despesa");
     } finally {
       setLoading(false);
     }

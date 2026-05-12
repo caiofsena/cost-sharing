@@ -32,7 +32,7 @@ export default function ParticipantsScreen() {
     if (activities.length > 0 && !selectedActivityId) {
       setSelectedActivityId(activities[0].id);
     }
-  }, [activities, selectedActivityId]);
+  }, [activities.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (selectedActivityId) {

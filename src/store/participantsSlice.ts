@@ -19,14 +19,14 @@ const initialState: ParticipantsState = {
   error: null,
 };
 
-function extractErrorMessage(err: any, fallback: string): string {
-  const data = err?.response?.data;
+function extractErrorMessage(err: unknown, fallback: string): string {
+  const data = (err as { response?: { data?: unknown } })?.response?.data;
   if (typeof data === "string") return data;
-  if (data?.reason) return data.reason;
-  if (data?.message) return data.message;
-  if (data?.error) return data.error;
-  if (Array.isArray(data?.errors) && data.errors.length > 0) return data.errors[0];
-  if (err?.message) return err.message;
+  if (data && typeof data === "object" && "reason" in data) return (data as { reason: string }).reason;
+  if (data && typeof data === "object" && "message" in data) return (data as { message: string }).message;
+  if (data && typeof data === "object" && "error" in data) return (data as { error: string }).error;
+  if (data && typeof data === "object" && "errors" in data && Array.isArray((data as { errors: unknown }).errors) && (data as { errors: string[] }).errors.length > 0) return (data as { errors: string[] }).errors[0];
+  if (err && typeof err === "object" && "message" in err) return (err as { message: string }).message;
   return fallback;
 }
 
@@ -39,7 +39,7 @@ export const fetchParticipants = createAsyncThunk(
         items: response.participants,
         activityName: response.activityName,
       };
-    } catch (err: any) {
+    } catch (err: unknown) {
       return rejectWithValue(extractErrorMessage(err, "Erro ao buscar participantes"));
     }
   }
@@ -50,7 +50,7 @@ export const addParticipants = createAsyncThunk(
   async ({ activityId, data }: { activityId: string; data: AddParticipantsRequest }, { rejectWithValue }) => {
     try {
       return await participantsService.add(activityId, data);
-    } catch (err: any) {
+    } catch (err: unknown) {
       return rejectWithValue(extractErrorMessage(err, "Erro ao adicionar participantes"));
     }
   }
@@ -61,7 +61,7 @@ export const removeParticipant = createAsyncThunk(
   async ({ activityId, userId }: { activityId: string; userId: string }, { rejectWithValue }) => {
     try {
       return await participantsService.remove(activityId, userId);
-    } catch (err: any) {
+    } catch (err: unknown) {
       return rejectWithValue(extractErrorMessage(err, "Erro ao remover participante"));
     }
   }

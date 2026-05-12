@@ -57,6 +57,8 @@ export function CreateExpenseModal({ visible, activityId, onClose }: CreateExpen
         amount: "",
       });
       setSelectedParticipants([]);
+    } else {
+      setSelectedParticipants([]);
     }
   }, [visible, reset]);
 
@@ -76,7 +78,8 @@ export function CreateExpenseModal({ visible, activityId, onClose }: CreateExpen
       dispatch(fetchActivityById(activityId));
       if (user?.id) dispatch(fetchActivities(user.id));
       onClose();
-    } catch {
+    } catch (err) {
+      console.error("Failed to create expense:", err);
     }
   }
 

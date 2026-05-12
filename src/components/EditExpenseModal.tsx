@@ -66,7 +66,8 @@ export function EditExpenseModal({
       dispatch(fetchActivityById(activityId));
       if (user?.id) dispatch(fetchActivities(user.id));
       onToggleSuccess?.();
-    } catch {
+    } catch (err) {
+      console.error("Failed to toggle payment:", err);
     } finally {
       setToggling(null);
     }
@@ -87,7 +88,8 @@ export function EditExpenseModal({
               dispatch(fetchActivityById(activityId));
               if (user?.id) dispatch(fetchActivities(user.id));
               onClose();
-            } catch {
+            } catch (err) {
+              console.error("Failed to delete expense:", err);
             }
           },
         },

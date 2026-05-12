@@ -21,14 +21,14 @@ const initialState: ExpensesState = {
   error: null,
 };
 
-function extractErrorMessage(err: any, fallback: string): string {
-  const data = err?.response?.data;
+function extractErrorMessage(err: unknown, fallback: string): string {
+  const data = (err as { response?: { data?: unknown } })?.response?.data;
   if (typeof data === "string") return data;
-  if (data?.reason) return data.reason;
-  if (data?.message) return data.message;
-  if (data?.error) return data.error;
-  if (Array.isArray(data?.errors) && data.errors.length > 0) return data.errors[0];
-  if (err?.message) return err.message;
+  if (data && typeof data === "object" && "reason" in data) return (data as { reason: string }).reason;
+  if (data && typeof data === "object" && "message" in data) return (data as { message: string }).message;
+  if (data && typeof data === "object" && "error" in data) return (data as { error: string }).error;
+  if (data && typeof data === "object" && "errors" in data && Array.isArray((data as { errors: unknown }).errors) && (data as { errors: string[] }).errors.length > 0) return (data as { errors: string[] }).errors[0];
+  if (err && typeof err === "object" && "message" in err) return (err as { message: string }).message;
   return fallback;
 }
 
@@ -38,7 +38,7 @@ export const fetchExpensesByActivity = createAsyncThunk(
     try {
       const response = await expensesService.listByActivity(activityId);
       return response.expenses;
-    } catch (err: any) {
+    } catch (err: unknown) {
       return rejectWithValue(extractErrorMessage(err, "Erro ao buscar despesas"));
     }
   }
@@ -49,7 +49,7 @@ export const fetchExpenseById = createAsyncThunk(
   async (expenseId: string, { rejectWithValue }) => {
     try {
       return await expensesService.getById(expenseId);
-    } catch (err: any) {
+    } catch (err: unknown) {
       return rejectWithValue(extractErrorMessage(err, "Erro ao buscar despesa"));
     }
   }
@@ -60,7 +60,7 @@ export const createExpense = createAsyncThunk(
   async ({ activityId, data }: { activityId: string; data: CreateExpenseRequest }, { rejectWithValue }) => {
     try {
       return await expensesService.create(activityId, data);
-    } catch (err: any) {
+    } catch (err: unknown) {
       return rejectWithValue(extractErrorMessage(err, "Erro ao criar despesa"));
     }
   }
@@ -71,7 +71,7 @@ export const updateExpense = createAsyncThunk(
   async ({ expenseId, data }: { expenseId: string; data: UpdateExpenseRequest }, { rejectWithValue }) => {
     try {
       return await expensesService.update(expenseId, data);
-    } catch (err: any) {
+    } catch (err: unknown) {
       return rejectWithValue(extractErrorMessage(err, "Erro ao atualizar despesa"));
     }
   }
@@ -82,7 +82,7 @@ export const deleteExpense = createAsyncThunk(
   async (expenseId: string, { rejectWithValue }) => {
     try {
       return await expensesService.delete(expenseId);
-    } catch (err: any) {
+    } catch (err: unknown) {
       return rejectWithValue(extractErrorMessage(err, "Erro ao excluir despesa"));
     }
   }
@@ -93,7 +93,7 @@ export const toggleParticipantPayment = createAsyncThunk(
   async ({ expenseId, participantId }: { expenseId: string; participantId: string }, { rejectWithValue }) => {
     try {
       return await expensesService.toggleParticipantPayment(expenseId, participantId);
-    } catch (err: any) {
+    } catch (err: unknown) {
       return rejectWithValue(extractErrorMessage(err, "Erro ao alternar pagamento"));
     }
   }

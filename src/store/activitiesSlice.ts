@@ -21,14 +21,14 @@ const initialState: ActivitiesState = {
   error: null,
 };
 
-function extractErrorMessage(err: any, fallback: string): string {
-  const data = err?.response?.data;
+function extractErrorMessage(err: unknown, fallback: string): string {
+  const data = (err as { response?: { data?: unknown } })?.response?.data;
   if (typeof data === "string") return data;
-  if (data?.reason) return data.reason;
-  if (data?.message) return data.message;
-  if (data?.error) return data.error;
-  if (Array.isArray(data?.errors) && data.errors.length > 0) return data.errors[0];
-  if (err?.message) return err.message;
+  if (data && typeof data === "object" && "reason" in data) return (data as { reason: string }).reason;
+  if (data && typeof data === "object" && "message" in data) return (data as { message: string }).message;
+  if (data && typeof data === "object" && "error" in data) return (data as { error: string }).error;
+  if (data && typeof data === "object" && "errors" in data && Array.isArray((data as { errors: unknown }).errors) && (data as { errors: string[] }).errors.length > 0) return (data as { errors: string[] }).errors[0];
+  if (err && typeof err === "object" && "message" in err) return (err as { message: string }).message;
   return fallback;
 }
 
@@ -38,7 +38,7 @@ export const fetchActivities = createAsyncThunk(
     try {
       const response = await activitiesService.listByUser(userId);
       return response.activities;
-    } catch (err: any) {
+    } catch (err: unknown) {
       return rejectWithValue(extractErrorMessage(err, "Erro ao buscar atividades"));
     }
   }
@@ -49,7 +49,7 @@ export const fetchActivityById = createAsyncThunk(
   async (activityId: string, { rejectWithValue }) => {
     try {
       return await activitiesService.getById(activityId);
-    } catch (err: any) {
+    } catch (err: unknown) {
       return rejectWithValue(extractErrorMessage(err, "Erro ao buscar atividade"));
     }
   }
@@ -60,7 +60,7 @@ export const createActivity = createAsyncThunk(
   async (data: CreateActivityRequest, { rejectWithValue }) => {
     try {
       return await activitiesService.create(data);
-    } catch (err: any) {
+    } catch (err: unknown) {
       return rejectWithValue(extractErrorMessage(err, "Erro ao criar atividade"));
     }
   }
@@ -71,7 +71,7 @@ export const updateActivity = createAsyncThunk(
   async ({ activityId, data }: { activityId: string; data: UpdateActivityRequest }, { rejectWithValue }) => {
     try {
       return await activitiesService.update(activityId, data);
-    } catch (err: any) {
+    } catch (err: unknown) {
       return rejectWithValue(extractErrorMessage(err, "Erro ao atualizar atividade"));
     }
   }
@@ -82,7 +82,7 @@ export const deleteActivity = createAsyncThunk(
   async (activityId: string, { rejectWithValue }) => {
     try {
       return await activitiesService.delete(activityId);
-    } catch (err: any) {
+    } catch (err: unknown) {
       return rejectWithValue(extractErrorMessage(err, "Erro ao excluir atividade"));
     }
   }

@@ -15,6 +15,22 @@ cssInterop(MCI, {
   },
 });
 
+function EmptyState({ onCreate }: { onCreate: () => void }) {
+  return (
+    <View className="flex-1 items-center justify-center px-8">
+      <View className="mb-6 h-24 w-24 items-center justify-center rounded-full bg-gray-700">
+        <MCI name="clipboard-text-outline" size={48} className="color-gray-400" />
+      </View>
+      <Text className="mb-6 text-center font-label-md text-label-md text-gray-300">
+        Você ainda não tem atividades criadas
+      </Text>
+      <Button onPress={onCreate} hasIconLeft>
+        <Text className="font-label-sm text-label-sm text-gray-800">Criar atividade</Text>
+      </Button>
+    </View>
+  );
+}
+
 export default function ResumeScreen() {
   const dispatch = useAppDispatch();
   const { statistics, loading } = useAppSelector((state) => state.balance);
@@ -47,22 +63,6 @@ export default function ResumeScreen() {
   const expensesCount = statistics?.expensesCount ?? 0;
   const participantsCount = statistics?.uniqueParticipantsCount ?? 0;
 
-  function EmptyState() {
-  return (
-    <View className="flex-1 items-center justify-center px-8">
-      <View className="mb-6 h-24 w-24 items-center justify-center rounded-full bg-gray-700">
-        <MCI name="clipboard-text-outline" size={48} className="color-gray-400" />
-      </View>
-      <Text className="mb-6 text-center font-label-md text-label-md text-gray-300">
-        Você ainda não tem atividades criadas
-      </Text>
-      <Button onPress={() => setModalVisible(true)} hasIconLeft>
-        <Text className="font-label-sm text-label-sm text-gray-800">Criar atividade</Text>
-      </Button>
-    </View>
-  );
-}
-
   return (
     <SafeAreaView className="flex-1 bg-gray-800">
       <View className="px-6 pt-4 pb-6">
@@ -80,7 +80,7 @@ export default function ResumeScreen() {
       </View>
       <View className='flex-1'>
         {activitiesCount === 0 ? (
-          <EmptyState />
+          <EmptyState onCreate={() => setModalVisible(true)} />
         ) : (
           <ScrollView showsVerticalScrollIndicator={false} contentContainerClassName="px-6 pb-8">
             <Text className="font-label-md text-label-md text-gray-100 mb-3">

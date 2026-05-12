@@ -48,6 +48,8 @@ export default [
       "react-native/no-color-literals": "warn",
       "react-native/sort-styles": "off",
       "react-native/no-raw-text": "off",
+      "react-hooks/set-state-in-effect": "off",
+      "react-hooks/static-components": "off",
     },
     settings: {
       react: { version: "detect" },

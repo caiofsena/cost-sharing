@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { useState } from "react";
 import { Text, TextInput, View, type TextInputProps } from "react-native";
 import { tv } from "tailwind-variants";
@@ -28,7 +29,7 @@ const inputIcon = tv({
 });
 
 type InputIconProps = TextInputProps & {
-  leftIcon: React.ReactNode;
+  leftIcon: ReactNode;
   error?: string;
 };
 

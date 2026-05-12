@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { ActivityIndicator, Modal, Pressable, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, Modal, Pressable, Text, View } from "react-native";
 import MCI from "@expo/vector-icons/MaterialCommunityIcons";
 import { cssInterop } from "nativewind";
 import { useForm, Controller } from "react-hook-form";
@@ -57,7 +57,8 @@ export function CreateActivityModal({ visible, userId, onClose }: CreateActivity
       })).unwrap();
       dispatch(fetchActivities(userId));
       onClose();
-    } catch {
+    } catch (err) {
+      console.error("Failed to create activity:", err);
     }
   }
 

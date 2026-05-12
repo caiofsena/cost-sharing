@@ -4,7 +4,6 @@ import MCI from "@expo/vector-icons/MaterialCommunityIcons";
 import { cssInterop } from "nativewind";
 
 import { Badge } from "./Badge";
-import { CoinIcon, UsersIcon } from "./icons";
 
 cssInterop(MCI, {
   className: {
