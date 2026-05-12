@@ -7,7 +7,8 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 
 import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { updateExpense, fetchExpensesByActivity, deleteExpense, clearError } from "../store/expensesSlice";
+import { fetchActivityById } from "../store/activitiesSlice";
+import { updateExpense, deleteExpense } from "../store/expensesSlice";
 import { Select, type SelectOption } from "./Select";
 import { Button } from './Button';
 
@@ -51,8 +52,7 @@ export function EditExpenseFormModal({
   onClose,
 }: EditExpenseFormModalProps) {
   const dispatch = useAppDispatch();
-  const { users } = useAppSelector((state) => state.auth);
-  const { error } = useAppSelector((state) => state.expenses);
+  const { current: activity } = useAppSelector((state) => state.activities);
   const { control, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<FormData>({
     resolver: yupResolver(schema),
     defaultValues: {
@@ -64,12 +64,12 @@ export function EditExpenseFormModal({
 
   useEffect(() => {
     if (visible) {
-      const participantOptions: SelectOption[] = (users ?? [])
-        .filter((p) => initialParticipantIds.includes(p?.id ?? ""))
+      const participantOptions: SelectOption[] = (activity?.participants ?? [])
+        .filter((p) => initialParticipantIds.includes(p.id))
         .map((p) => ({
-          id: p?.id ?? "",
-          name: p?.name ?? "",
-          initials: p?.name.substring(0, 2).toUpperCase() ?? "",
+          id: p.id,
+          name: p.name,
+          initials: p.name.substring(0, 2).toUpperCase(),
         }));
 
       reset({
@@ -78,7 +78,7 @@ export function EditExpenseFormModal({
       });
       setSelectedParticipants(participantOptions);
     }
-  }, [visible, initialTitle, initialAmountInCents, initialParticipantIds, users, reset]);
+  }, [visible, initialTitle, initialAmountInCents, initialParticipantIds, activity, reset]);
 
   async function onSubmit(data: FormData) {
     const amountInCents = Math.round(parseFloat(data.amount.replace(",", ".")) * 100);
@@ -93,7 +93,7 @@ export function EditExpenseFormModal({
           participantsIds: participantIds,
         },
       })).unwrap();
-      dispatch(fetchExpensesByActivity(activityId));
+      dispatch(fetchActivityById(activityId));
       onClose();
     } catch {
     }
@@ -111,7 +111,7 @@ export function EditExpenseFormModal({
           onPress: async () => {
             try {
               await dispatch(deleteExpense(expenseId)).unwrap();
-              dispatch(fetchExpensesByActivity(activityId));
+              dispatch(fetchActivityById(activityId));
               onClose();
             } catch {
             }
@@ -125,13 +125,12 @@ export function EditExpenseFormModal({
     reset();
     setSelectedParticipants([]);
     onClose();
-    dispatch(clearError());
   }
 
-  const participantOptions: SelectOption[] = (users ?? []).map((p) => ({
-    id: p?.id ?? "",
-    name: p?.name ?? "",
-    initials: p?.name.substring(0, 2).toUpperCase() ?? "",
+  const participantOptions: SelectOption[] = (activity?.participants ?? []).map((p) => ({
+    id: p.id,
+    name: p.name,
+    initials: p.name.substring(0, 2).toUpperCase(),
   }));
 
   const amountDisplay = (initialAmountInCents / 100).toLocaleString("pt-BR", {
@@ -167,14 +166,6 @@ export function EditExpenseFormModal({
               <MCI name="close" size={24} className="color-gray-300" />
             </Pressable>
           </View>
-
-          {error ? (
-            <View className="mb-4 rounded-md bg-danger-low p-3">
-              <Text className="text-center font-text-sm text-text-sm text-danger-light">
-                {error}
-              </Text>
-            </View>
-          ) : null}
 
           <View className="gap-5">
             <View>

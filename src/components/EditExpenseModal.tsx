@@ -4,7 +4,8 @@ import MCI from "@expo/vector-icons/MaterialCommunityIcons";
 import { cssInterop } from "nativewind";
 
 import { useAppDispatch } from "../store/hooks";
-import { deleteExpense, fetchExpensesByActivity, toggleParticipantPayment } from "../store/expensesSlice";
+import { fetchActivityById } from "../store/activitiesSlice";
+import { deleteExpense, toggleParticipantPayment } from "../store/expensesSlice";
 import { StatusSelect } from "./StatusSelect";
 import type { ExpenseDetailResponse } from "../services/types";
 import { Button } from './Button';
@@ -14,6 +15,12 @@ cssInterop(MCI, {
     target: "style",
   },
 });
+
+function getInitials(name: string): string {
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
 
 type EditExpenseModalProps = {
   visible: boolean;
@@ -53,6 +60,7 @@ export function EditExpenseModal({
     setToggling(participantId);
     try {
       await dispatch(toggleParticipantPayment({ expenseId: expense.id, participantId })).unwrap();
+      dispatch(fetchActivityById(activityId));
     } catch {
     } finally {
       setToggling(null);
@@ -71,7 +79,7 @@ export function EditExpenseModal({
           onPress: async () => {
             try {
               await dispatch(deleteExpense(expense.id)).unwrap();
-              dispatch(fetchExpensesByActivity(activityId));
+              dispatch(fetchActivityById(activityId));
               onClose();
             } catch {
             }
@@ -142,7 +150,7 @@ export function EditExpenseModal({
                   <View className="flex-row items-center gap-3">
                     <View className="h-10 w-10 items-center justify-center rounded-full bg-gray-600">
                       <Text className="font-label-sm text-label-sm text-gray-100">
-                        {p.name.substring(0, 2).toUpperCase()}
+                        {getInitials(p.name)}
                       </Text>
                     </View>
                     <View>

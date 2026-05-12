@@ -6,10 +6,9 @@ import { cssInterop } from "nativewind";
 
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { fetchActivityById, clearCurrent, fetchActivities } from "../store/activitiesSlice";
-import { fetchExpensesByActivity, fetchExpenseById, clearCurrent as clearExpenseCurrent } from "../store/expensesSlice";
+import { fetchExpenseById, clearCurrent as clearExpenseCurrent } from "../store/expensesSlice";
 import { Button, ExpenseCard, CreateExpenseModal, EditActivityModal, EditExpenseModal, EditExpenseFormModal } from "../components";
-import type { ExpenseDetailResponse } from "../services/types";
-import { listUsers } from '../store/authSlice';
+import type { ActivityDetailResponseExpenseInfo, ExpenseDetailResponse } from "../services/types";
 
 cssInterop(MCI, {
   className: {
@@ -25,6 +24,23 @@ type ExpensesScreenProps = {
   };
   navigation: any;
 };
+
+function getInitials(name: string): string {
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
+function computeExpenseStatus(
+  participants: { paymentStatus: string }[]
+): "paid" | "partial" | "pending" {
+  if (participants.length === 0) return "pending";
+  const allPaid = participants.every((p) => p.paymentStatus === "paid");
+  const anyPaid = participants.some((p) => p.paymentStatus === "paid");
+  if (allPaid) return "paid";
+  if (anyPaid) return "partial";
+  return "pending";
+}
 
 function EmptyState({ onCreate }: { onCreate: () => void }) {
   return (
@@ -42,16 +58,22 @@ function EmptyState({ onCreate }: { onCreate: () => void }) {
   );
 }
 
-function ExpenseItem({ item, onPress }: { item: { id: string; name: string; amountInCents: number; participantsCount: number }; onPress: () => void }) {
+function ExpenseItem({ item, onPress }: { item: ActivityDetailResponseExpenseInfo; onPress: () => void }) {
   const totalAmount = (item.amountInCents / 100).toLocaleString("pt-BR", {
     style: "currency",
     currency: "BRL",
   });
 
-  const perPerson = (item.amountInCents / 100 / item.participantsCount).toLocaleString("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  });
+  const participantsCount = item.participants.length;
+  const perPerson = participantsCount > 0
+    ? (item.amountInCents / 100 / participantsCount).toLocaleString("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+      })
+    : totalAmount;
+
+  const initials = item.participants.map((p) => getInitials(p.name));
+  const status = computeExpenseStatus(item.participants);
 
   return (
     <Pressable onPress={onPress}>
@@ -59,8 +81,8 @@ function ExpenseItem({ item, onPress }: { item: { id: string; name: string; amou
         title={item.name}
         amount={totalAmount}
         perPerson={`${perPerson} / pessoa`}
-        initials={["JS", "MO"]}
-        status="pending"
+        initials={initials}
+        status={status}
       />
     </Pressable>
   );
@@ -71,7 +93,6 @@ export default function ExpensesScreen({ route, navigation }: ExpensesScreenProp
   const { activityId } = route.params;
   const { user } = useAppSelector((state) => state.auth);
   const { current: activity, loading: activityLoading } = useAppSelector((state) => state.activities);
-  const { items: expenses, loading: expensesLoading } = useAppSelector((state) => state.expenses);
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [editActivityModalVisible, setEditActivityModalVisible] = useState(false);
   const [editExpenseModalVisible, setEditExpenseModalVisible] = useState(false);
@@ -80,7 +101,6 @@ export default function ExpensesScreen({ route, navigation }: ExpensesScreenProp
 
   useEffect(() => {
     dispatch(fetchActivityById(activityId));
-    dispatch(fetchExpensesByActivity(activityId));
 
     return () => {
       dispatch(clearCurrent());
@@ -89,7 +109,6 @@ export default function ExpensesScreen({ route, navigation }: ExpensesScreenProp
   }, [dispatch, activityId]);
 
   useEffect(() => {
-    dispatch(listUsers());
     if (user?.id) {
       dispatch(fetchActivities(user.id));
     }
@@ -126,9 +145,9 @@ export default function ExpensesScreen({ route, navigation }: ExpensesScreenProp
     setEditExpenseFormModalVisible(false);
   }
 
-  const loading = activityLoading || expensesLoading;
+  const expenses = activity?.expenses ?? [];
 
-  if (loading) {
+  if (activityLoading) {
     return (
       <SafeAreaView className="flex-1 items-center justify-center bg-gray-800">
         <ActivityIndicator size="large" color="#30A65D" />
@@ -192,7 +211,7 @@ export default function ExpensesScreen({ route, navigation }: ExpensesScreenProp
                     className={`h-8 w-8 items-center justify-center rounded-full bg-gray-600 ${i > 0 ? "-ml-2" : ""}`}
                   >
                     <Text className="text-[10px] font-label-sm text-gray-100">
-                      {p.name.substring(0, 2).toUpperCase()}
+                      {getInitials(p.name)}
                     </Text>
                   </View>
                 ))}
