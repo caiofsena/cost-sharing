@@ -2,6 +2,11 @@
 
 Aplicativo React Native para divisão de despesas entre participantes de atividades compartilhadas. Gerencie atividades, registre despesas, acompanhe saldos e controle quem pagou o quê.
 
+<img width="240" height="550" alt="Simulator Screenshot - iPhone 17 - 2026-05-12 at 14 06 25" src="https://github.com/user-attachments/assets/b8664754-50eb-4dbc-b289-4be6c5f24393" />
+<img width="240" height="550" alt="Simulator Screenshot - iPhone 17 - 2026-05-12 at 14 06 15" src="https://github.com/user-attachments/assets/1fab7a6a-c689-4e2f-84ff-c6073f2ea555" />
+<img width="240" height="550" alt="Simulator Screenshot - iPhone 17 - 2026-05-12 at 14 06 18" src="https://github.com/user-attachments/assets/d27c6f34-f0fc-4fb5-b608-ada5ff091a18" />
+<img width="240" height="550" alt="Simulator Screenshot - iPhone 17 - 2026-05-12 at 14 06 21" src="https://github.com/user-attachments/assets/b00cc3e9-32e7-4248-82bf-047ee87da647" />
+
 ## Tecnologias
 
 | Camada | Tecnologia |
