@@ -1,49 +1,49 @@
-# Developer Setup Guide
+# Guia de Configuração para Desenvolvedores
 
-## Pre-commit Hooks
+## Hooks de Pre-commit
 
-This project uses **Husky** + **lint-staged** to automatically run code quality checks before each commit.
+Este projeto utiliza **Husky** + **lint-staged** para executar automaticamente verificações de qualidade de código antes de cada commit.
 
-### What happens on commit:
-1. **Prettier** formats your code automatically
-2. **ESLint** fixes any linting issues
-3. If checks fail, the commit is blocked
+### O que acontece no commit:
+1. **Prettier** formata seu código automaticamente
+2. **ESLint** corrige problemas de linting
+3. Se as verificações falharem, o commit é bloqueado
 
-### Manual commands:
+### Comandos manuais:
 ```bash
-# Format all files
+# Formatar todos os arquivos
 npm run format
 
-# Run ESLint
+# Executar ESLint
 npm run lint
 
-# Run TypeScript check
+# Executar verificação do TypeScript
 npx tsc --noEmit
 ```
 
-## Absolute Imports
+## Imports Absolutos
 
-Use `@/` instead of relative paths:
+Use `@/` ao invés de caminhos relativos:
 
 ```typescript
-// ❌ Before
+// ❌ Antes
 import { Button } from "../../components/Button";
 import { useAppDispatch } from "../../store/hooks";
 
-// ✅ After
+// ✅ Depois
 import { Button } from "@/components/Button";
 import { useAppDispatch } from "@/store/hooks";
 ```
 
-## Editor Setup
+## Configuração do Editor
 
-### VS Code (Recommended)
+### VS Code (Recomendado)
 
-Install these extensions:
+Instale estas extensões:
 - **ESLint** (dbaeumer.vscode-eslint)
 - **Prettier** (esbenp.prettier-vscode)
 
-Add to your `.vscode/settings.json`:
+Adicione ao seu `.vscode/settings.json`:
 ```json
 {
   "editor.formatOnSave": true,
@@ -54,18 +54,18 @@ Add to your `.vscode/settings.json`:
 }
 ```
 
-### Other Editors
+### Outros Editores
 
-The `.editorconfig` file ensures consistent formatting across all editors that support it.
+O arquivo `.editorconfig` garante formatação consistente em todos os editores que o suportam.
 
-## Configuration Files
+## Arquivos de Configuração
 
-| File | Purpose |
+| Arquivo | Propósito |
 |------|---------|
-| `.prettierrc` | Prettier formatting rules |
-| `.prettierignore` | Files to exclude from formatting |
-| `.editorconfig` | Editor-agnostic formatting rules |
-| `eslint.config.js` | ESLint linting rules |
-| `.husky/pre-commit` | Git hook that runs lint-staged |
-| `tsconfig.json` | TypeScript + absolute import paths |
-| `babel.config.js` | Babel module-resolver for runtime |
+| `.prettierrc` | Regras de formatação do Prettier |
+| `.prettierignore` | Arquivos a excluir da formatação |
+| `.editorconfig` | Regras de formatação independentes do editor |
+| `eslint.config.js` | Regras de linting do ESLint |
+| `.husky/pre-commit` | Hook do Git que executa lint-staged |
+| `tsconfig.json` | TypeScript + caminhos de import absoluto |
+| `babel.config.js` | module-resolver do Babel para runtime |
