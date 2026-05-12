@@ -6,9 +6,9 @@ import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 
-import { useAppDispatch } from "../store/hooks";
-import { updateActivity, deleteActivity, fetchActivities } from "../store/activitiesSlice";
-import { Button } from "./Button";
+import { useAppDispatch } from "@/store/hooks";
+import { updateActivity, deleteActivity, fetchActivities } from "@/store/activitiesSlice";
+import { Button } from "@/components/Button";
 
 cssInterop(MCI, {
   className: {
@@ -18,7 +18,10 @@ cssInterop(MCI, {
 
 const schema = yup.object({
   title: yup.string().required("Informe o nome da atividade").trim(),
-  activityDate: yup.string().required("Informe a data").matches(/^\d{4}-\d{2}-\d{2}$/, "Formato: AAAA-MM-DD"),
+  activityDate: yup
+    .string()
+    .required("Informe a data")
+    .matches(/^\d{4}-\d{2}-\d{2}$/, "Formato: AAAA-MM-DD"),
 });
 
 type FormData = yup.InferType<typeof schema>;
@@ -43,7 +46,12 @@ export function EditActivityModal({
   onDelete,
 }: EditActivityModalProps) {
   const dispatch = useAppDispatch();
-  const { control, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<FormData>({
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<FormData>({
     resolver: yupResolver(schema),
     defaultValues: {
       title: initialName,
@@ -62,13 +70,15 @@ export function EditActivityModal({
 
   async function onSubmit(data: FormData) {
     try {
-      await dispatch(updateActivity({
-        activityId,
-        data: {
-          title: data.title.trim(),
-          activityDate: new Date(data.activityDate).toISOString(),
-        },
-      })).unwrap();
+      await dispatch(
+        updateActivity({
+          activityId,
+          data: {
+            title: data.title.trim(),
+            activityDate: new Date(data.activityDate).toISOString(),
+          },
+        }),
+      ).unwrap();
       dispatch(fetchActivities(userId));
       onClose();
     } catch (err) {
@@ -95,7 +105,7 @@ export function EditActivityModal({
             }
           },
         },
-      ]
+      ],
     );
   }
 
@@ -105,24 +115,14 @@ export function EditActivityModal({
   }
 
   return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="fade"
-      onRequestClose={handleClose}
-    >
-      <Pressable
-        className="flex-1 bg-black/60 items-center justify-center px-6"
-        onPress={handleClose}
-      >
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={handleClose}>
+      <Pressable className="flex-1 bg-black/60 items-center justify-center px-6" onPress={handleClose}>
         <Pressable
           className="w-full rounded-2xl bg-gray-700 border border-gray-500 p-6"
           onPress={(e) => e.stopPropagation()}
         >
           <View className="mb-6 flex-row items-center justify-between">
-            <Text className="font-heading-lg text-heading-lg text-gray-100">
-              Editar Atividade
-            </Text>
+            <Text className="font-heading-lg text-heading-lg text-gray-100">Editar Atividade</Text>
             <Pressable onPress={handleClose} className="p-1">
               <MCI name="close" size={24} className="color-gray-300" />
             </Pressable>
@@ -143,9 +143,7 @@ export function EditActivityModal({
                       onChangeText={onChange}
                     />
                     {errors.title && (
-                      <Text className="mt-1 font-text-xs text-text-xs text-danger-light">
-                        {errors.title.message}
-                      </Text>
+                      <Text className="mt-1 font-text-xs text-text-xs text-danger-light">{errors.title.message}</Text>
                     )}
                   </>
                 )}
@@ -189,9 +187,7 @@ export function EditActivityModal({
               {isSubmitting ? (
                 <ActivityIndicator color="#0B0B0E" />
               ) : (
-                <Text className="font-label-md text-label-md text-gray-800">
-                  Salvar
-                </Text>
+                <Text className="font-label-md text-label-md text-gray-800">Salvar</Text>
               )}
             </Button>
           </View>

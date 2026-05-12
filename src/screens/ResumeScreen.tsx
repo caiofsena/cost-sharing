@@ -4,10 +4,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Logo from "../../assets/logo.svg";
 import MCI from "@expo/vector-icons/MaterialCommunityIcons";
 import { cssInterop } from "nativewind";
-
-import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { fetchUserStatistics } from "../store/balanceSlice";
-import { Button, CreateActivityModal } from '../components';
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { fetchUserStatistics } from "@/store/balanceSlice";
+import { Button, CreateActivityModal } from "@/components";
 
 cssInterop(MCI, {
   className: {
@@ -71,29 +70,23 @@ export default function ResumeScreen() {
           <Text className="font-heading-lg text-green-base ml-2">Cost</Text>
           <Text className="font-heading-sm text-green-light">Sharing</Text>
         </View>
-        <Text className="font-heading-lg text-heading-lg text-gray-100">
-          Resumo
-        </Text>
+        <Text className="font-heading-lg text-heading-lg text-gray-100">Resumo</Text>
         <Text className="mt-1 font-text-sm text-text-sm text-gray-300">
           Acompanhe as informações principais sobre suas atividades
         </Text>
       </View>
-      <View className='flex-1'>
+      <View className="flex-1">
         {activitiesCount === 0 ? (
           <EmptyState onCreate={() => setModalVisible(true)} />
         ) : (
           <ScrollView showsVerticalScrollIndicator={false} contentContainerClassName="px-6 pb-8">
-            <Text className="font-label-md text-label-md text-gray-100 mb-3">
-              Minhas contas
-            </Text>
+            <Text className="font-label-md text-label-md text-gray-100 mb-3">Minhas contas</Text>
             <View className="rounded-2xl bg-gray-800 border border-gray-600 p-5 mb-3 flex-row items-center gap-4">
               <View className="h-12 w-12 items-center justify-center rounded-xl bg-green-900">
                 <MCI name="check" size={24} className="color-green-base" />
               </View>
               <View className="flex-1">
-                <Text className="font-heading-lg text-heading-lg text-gray-100">
-                  {paidFormatted}
-                </Text>
+                <Text className="font-heading-lg text-heading-lg text-gray-100">{paidFormatted}</Text>
                 <Text className="font-text-sm text-text-sm text-gray-400">
                   Pago em {paidCount} {paidCount === 1 ? "despesa" : "despesas"}
                 </Text>
@@ -105,30 +98,22 @@ export default function ResumeScreen() {
                 <MCI name="alert-octagon-outline" size={24} className="color-danger-light" />
               </View>
               <View className="flex-1">
-                <Text className="font-heading-lg text-heading-lg text-gray-100">
-                  {pendingFormatted}
-                </Text>
+                <Text className="font-heading-lg text-heading-lg text-gray-100">{pendingFormatted}</Text>
                 <Text className="font-text-sm text-text-sm text-gray-400">
                   Pendente em {pendingCount} {pendingCount === 1 ? "despesa" : "despesas"}
                 </Text>
               </View>
             </View>
 
-            <Text className="font-label-md text-label-md text-gray-100 mb-3">
-              Informações gerais
-            </Text>
+            <Text className="font-label-md text-label-md text-gray-100 mb-3">Informações gerais</Text>
 
             <View className="rounded-2xl bg-gray-800 border border-gray-600 p-5 mb-4 flex-row items-center gap-4">
               <View className="h-12 w-12 items-center justify-center rounded-xl bg-gray-700">
                 <MCI name="clock-outline" size={20} className="color-green-light" />
               </View>
               <View className="flex-1">
-                <Text className="font-heading-lg text-heading-lg text-gray-100">
-                  {totalFormatted}
-                </Text>
-                <Text className="font-text-sm text-text-sm text-gray-400">
-                  Total de despesas
-                </Text>
+                <Text className="font-heading-lg text-heading-lg text-gray-100">{totalFormatted}</Text>
+                <Text className="font-text-sm text-text-sm text-gray-400">Total de despesas</Text>
               </View>
               <View className="w-10" />
             </View>
@@ -136,48 +121,32 @@ export default function ResumeScreen() {
             <View className="flex-row gap-2">
               <View className="flex-1 flex-row rounded-2xl bg-gray-800 border border-gray-600 p-3 justify-center">
                 <View>
-                  <Text className="font-heading-lg text-heading-lg text-gray-200 mt-1">
-                    {activitiesCount}
-                  </Text>
-                  <Text className="font-text-xs text-text-xs text-gray-400 mt-4">
-                    Atividades
-                  </Text>
+                  <Text className="font-heading-lg text-heading-lg text-gray-200 mt-1">{activitiesCount}</Text>
+                  <Text className="font-text-xs text-text-xs text-gray-400 mt-4">Atividades</Text>
                 </View>
                 <MCI name="format-list-bulleted" size={18} className="color-green-light" />
               </View>
 
               <View className="flex-1 flex-row rounded-2xl bg-gray-800 border border-gray-600 p-2 justify-between">
                 <View>
-                  <Text className="font-heading-lg text-heading-lg text-gray-200 mt-1">
-                    {expensesCount}
-                  </Text>
-                  <Text className="font-text-xs text-text-xs text-gray-400 mt-4">
-                    Despesas
-                  </Text>
+                  <Text className="font-heading-lg text-heading-lg text-gray-200 mt-1">{expensesCount}</Text>
+                  <Text className="font-text-xs text-text-xs text-gray-400 mt-4">Despesas</Text>
                 </View>
                 <MCI name="currency-usd" size={18} className="color-green-light" />
               </View>
 
               <View className="flex-1 flex-row rounded-2xl bg-gray-800 border border-gray-600 p-2 justify-between">
                 <View>
-                  <Text className="font-heading-lg text-heading-lg text-gray-200 mt-1">
-                    {participantsCount}
-                  </Text>
-                  <Text className="font-text-xs text-text-xs text-gray-400 mt-4">
-                    Participantes
-                  </Text>
+                  <Text className="font-heading-lg text-heading-lg text-gray-200 mt-1">{participantsCount}</Text>
+                  <Text className="font-text-xs text-text-xs text-gray-400 mt-4">Participantes</Text>
                 </View>
                 <MCI name="account-group" size={18} className="color-green-light" />
               </View>
             </View>
-        </ScrollView>
+          </ScrollView>
         )}
       </View>
-      <CreateActivityModal
-        visible={modalVisible}
-        userId={user?.id ?? ""}
-        onClose={() => setModalVisible(false)}
-      />
+      <CreateActivityModal visible={modalVisible} userId={user?.id ?? ""} onClose={() => setModalVisible(false)} />
     </SafeAreaView>
   );
 }

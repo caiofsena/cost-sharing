@@ -3,5 +3,16 @@ module.exports = function (api) {
 
   return {
     presets: [["babel-preset-expo", { jsxImportSource: "nativewind" }]],
+    plugins: [
+      [
+        "module-resolver",
+        {
+          root: ["./src"],
+          alias: {
+            "@": "./src",
+          },
+        },
+      ],
+    ],
   };
 };

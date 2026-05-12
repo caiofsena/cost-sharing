@@ -12,7 +12,7 @@ import {
   Select,
   StatusSelect,
   type SelectOption,
-} from "../components";
+} from "@/components";
 
 export default function ComponentsScreen() {
   const [status, setStatus] = useState<"pending" | "paid">("pending");
@@ -29,9 +29,7 @@ export default function ComponentsScreen() {
     <ScrollView className="flex-1 bg-gray-800" contentContainerClassName="gap-8 px-6 py-10">
       <View>
         <Text className="font-heading-lg text-heading-lg text-gray-100">Components</Text>
-        <Text className="mt-1 font-text-sm text-text-sm text-gray-300">
-          Variações baseadas nas referências.
-        </Text>
+        <Text className="mt-1 font-text-sm text-text-sm text-gray-300">Variações baseadas nas referências.</Text>
       </View>
 
       <Section title="Status Select">
@@ -101,12 +99,24 @@ export default function ComponentsScreen() {
 
       <Section title="Buttons">
         <View className="items-center gap-8">
-          <Button intent="primary" ><Text className="font-label-sm text-label-sm text-gray-800">Primary</Text></Button>
-          <Button intent="secondary" ><Text className="font-label-sm text-label-sm text-gray-800">Secondary</Text></Button>
-          <Button intent="danger" ><Text className="font-label-sm text-label-sm text-gray-800">Danger</Text></Button>
-          <Button intent="primary" hasIconLeft><Text className="font-label-sm text-label-sm text-gray-800">Primary</Text></Button>
-          <Button intent="secondary" hasIconLeft><Text className="font-label-sm text-label-sm text-gray-800">Secondary</Text></Button>
-          <Button intent="danger" hasIconLeft><Text className="font-label-sm text-label-sm text-gray-800">Danger</Text></Button>
+          <Button intent="primary">
+            <Text className="font-label-sm text-label-sm text-gray-800">Primary</Text>
+          </Button>
+          <Button intent="secondary">
+            <Text className="font-label-sm text-label-sm text-gray-800">Secondary</Text>
+          </Button>
+          <Button intent="danger">
+            <Text className="font-label-sm text-label-sm text-gray-800">Danger</Text>
+          </Button>
+          <Button intent="primary" hasIconLeft>
+            <Text className="font-label-sm text-label-sm text-gray-800">Primary</Text>
+          </Button>
+          <Button intent="secondary" hasIconLeft>
+            <Text className="font-label-sm text-label-sm text-gray-800">Secondary</Text>
+          </Button>
+          <Button intent="danger" hasIconLeft>
+            <Text className="font-label-sm text-label-sm text-gray-800">Danger</Text>
+          </Button>
         </View>
       </Section>
     </ScrollView>

@@ -4,11 +4,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Logo from "../../assets/logo.svg";
 import MCI from "@expo/vector-icons/MaterialCommunityIcons";
 import { cssInterop } from "nativewind";
-
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { fetchActivities } from "@/store/activitiesSlice";
+import { ActivityCard, Button, CreateActivityModal } from "@/components";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { fetchActivities } from "../store/activitiesSlice";
-import { ActivityCard, Button, CreateActivityModal } from "../components";
 
 cssInterop(MCI, {
   className: {
@@ -29,7 +28,20 @@ function EmptyState() {
   );
 }
 
-function ActivityItem({ item, onPress }: { item: { id: string; name: string; activityDate: string; totalAmountInCents: number; participantsAmount: number; expensesAmount: number }; onPress: () => void }) {
+function ActivityItem({
+  item,
+  onPress,
+}: {
+  item: {
+    id: string;
+    name: string;
+    activityDate: string;
+    totalAmountInCents: number;
+    participantsAmount: number;
+    expensesAmount: number;
+  };
+  onPress: () => void;
+}) {
   const totalAmount = (item.totalAmountInCents / 100).toLocaleString("pt-BR", {
     style: "currency",
     currency: "BRL",
@@ -54,7 +66,11 @@ type ActivitiesStackParamList = {
   Expenses: { activityId: string };
 };
 
-export default function ActivitiesScreen({ navigation }: { navigation: NativeStackNavigationProp<ActivitiesStackParamList> }) {
+export default function ActivitiesScreen({
+  navigation,
+}: {
+  navigation: NativeStackNavigationProp<ActivitiesStackParamList>;
+}) {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
   const { items, loading } = useAppSelector((state) => state.activities);
@@ -82,12 +98,8 @@ export default function ActivitiesScreen({ navigation }: { navigation: NativeSta
           <Text className="font-heading-lg text-green-base ml-2">Cost</Text>
           <Text className="font-heading-sm text-green-light">Sharing</Text>
         </View>
-        <Text className="mt-1 font-heading-lg text-heading-lg text-gray-100">
-          Atividades
-        </Text>
-        <Text className="mt-1 font-text-sm text-text-sm text-gray-400">
-          Organize suas despesas divididas
-        </Text>
+        <Text className="mt-1 font-heading-lg text-heading-lg text-gray-100">Atividades</Text>
+        <Text className="mt-1 font-text-sm text-text-sm text-gray-400">Organize suas despesas divididas</Text>
       </View>
 
       {items.length === 0 ? (
@@ -97,29 +109,18 @@ export default function ActivitiesScreen({ navigation }: { navigation: NativeSta
           data={items}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
-            <ActivityItem
-              item={item}
-              onPress={() => navigation.navigate("Expenses", { activityId: item.id })}
-            />
+            <ActivityItem item={item} onPress={() => navigation.navigate("Expenses", { activityId: item.id })} />
           )}
           contentContainerClassName="gap-4 px-6 py-4"
           showsVerticalScrollIndicator={false}
         />
       )}
 
-      <Button
-        onPress={() => setModalVisible(true)}
-        className="absolute bottom-6 right-6"
-        hasIconLeft
-      >
+      <Button onPress={() => setModalVisible(true)} className="absolute bottom-6 right-6" hasIconLeft>
         <Text className="font-label-sm text-label-sm text-gray-800">Criar</Text>
       </Button>
 
-      <CreateActivityModal
-        visible={modalVisible}
-        userId={user?.id ?? ""}
-        onClose={() => setModalVisible(false)}
-      />
+      <CreateActivityModal visible={modalVisible} userId={user?.id ?? ""} onClose={() => setModalVisible(false)} />
     </SafeAreaView>
   );
 }

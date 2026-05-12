@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { authService } from "../services";
-import type { SignInRequest, SignUpRequest } from "../services/types";
+import { authService } from "@/services";
+import type { SignInRequest, SignUpRequest } from "@/services/types";
 
 interface AuthState {
   token: string | null;
@@ -29,21 +29,18 @@ const initialState: AuthState = {
   signupError: null,
 };
 
-export const checkStoredAuth = createAsyncThunk(
-  "auth/checkStoredAuth",
-  async () => {
-    const token = await AsyncStorage.getItem("auth_token");
-    if (!token) return { token: null, user: null };
+export const checkStoredAuth = createAsyncThunk("auth/checkStoredAuth", async () => {
+  const token = await AsyncStorage.getItem("auth_token");
+  if (!token) return { token: null, user: null };
 
-    try {
-      const profile = await authService.getProfile();
-      return { token, user: { id: profile.id, email: profile.email, name: profile.name } };
-    } catch {
-      await AsyncStorage.removeItem("auth_token");
-      return { token: null, user: null };
-    }
+  try {
+    const profile = await authService.getProfile();
+    return { token, user: { id: profile.id, email: profile.email, name: profile.name } };
+  } catch {
+    await AsyncStorage.removeItem("auth_token");
+    return { token: null, user: null };
   }
-);
+});
 
 function extractErrorMessage(err: unknown, fallback: string): string {
   const data = (err as { response?: { data?: unknown } })?.response?.data;
@@ -51,55 +48,53 @@ function extractErrorMessage(err: unknown, fallback: string): string {
   if (data && typeof data === "object" && "reason" in data) return (data as { reason: string }).reason;
   if (data && typeof data === "object" && "message" in data) return (data as { message: string }).message;
   if (data && typeof data === "object" && "error" in data) return (data as { error: string }).error;
-  if (data && typeof data === "object" && "errors" in data && Array.isArray((data as { errors: unknown }).errors) && (data as { errors: string[] }).errors.length > 0) return (data as { errors: string[] }).errors[0];
+  if (
+    data &&
+    typeof data === "object" &&
+    "errors" in data &&
+    Array.isArray((data as { errors: unknown }).errors) &&
+    (data as { errors: string[] }).errors.length > 0
+  )
+    return (data as { errors: string[] }).errors[0];
   if (err && typeof err === "object" && "message" in err) return (err as { message: string }).message;
   return fallback;
 }
 
-export const signIn = createAsyncThunk(
-  "auth/signIn",
-  async (data: SignInRequest, { rejectWithValue }) => {
-    try {
-      const response = await authService.signIn(data);
-      return {
-        token: response.token,
-        user: { id: response.id, email: response.email, name: response.name },
-      };
-    } catch (err: unknown) {
-      return rejectWithValue(extractErrorMessage(err, "Erro ao fazer login"));
-    }
+export const signIn = createAsyncThunk("auth/signIn", async (data: SignInRequest, { rejectWithValue }) => {
+  try {
+    const response = await authService.signIn(data);
+    return {
+      token: response.token,
+      user: { id: response.id, email: response.email, name: response.name },
+    };
+  } catch (err: unknown) {
+    return rejectWithValue(extractErrorMessage(err, "Erro ao fazer login"));
   }
-);
+});
 
-export const signUp = createAsyncThunk(
-  "auth/signUp",
-  async (data: SignUpRequest, { rejectWithValue }) => {
-    try {
-      const response = await authService.signUp(data);
-      return {
-        token: response.token,
-        user: { id: response.id, email: response.email, name: response.name },
-      };
-    } catch (err: unknown) {
-      return rejectWithValue(extractErrorMessage(err, "Erro ao criar conta"));
-    }
+export const signUp = createAsyncThunk("auth/signUp", async (data: SignUpRequest, { rejectWithValue }) => {
+  try {
+    const response = await authService.signUp(data);
+    return {
+      token: response.token,
+      user: { id: response.id, email: response.email, name: response.name },
+    };
+  } catch (err: unknown) {
+    return rejectWithValue(extractErrorMessage(err, "Erro ao criar conta"));
   }
-);
+});
 export const signOut = createAsyncThunk("auth/signOut", async () => {
   await authService.signOut();
 });
 
-export const listUsers = createAsyncThunk(
-  "auth/listUsers",
-  async (_, { rejectWithValue }) => {
-    try {
-      const response = await authService.listUsers();
-      return response.users;
-    } catch (err: unknown) {
-      return rejectWithValue(extractErrorMessage(err, "Erro ao buscar usuários"));
-    }
+export const listUsers = createAsyncThunk("auth/listUsers", async (_, { rejectWithValue }) => {
+  try {
+    const response = await authService.listUsers();
+    return response.users;
+  } catch (err: unknown) {
+    return rejectWithValue(extractErrorMessage(err, "Erro ao buscar usuários"));
   }
-);
+});
 
 const authSlice = createSlice({
   name: "auth",

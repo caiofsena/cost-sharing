@@ -11,7 +11,9 @@
     "dev:ios": "expo run:ios",
     "build:android": "eas build --platform android --profile development",
     "build:ios": "eas build --platform ios --profile development",
-    "lint": "eslint . --ext .ts,.tsx"
+    "lint": "eslint . --ext .ts,.tsx",
+    "format": "prettier --write \"src/**/*.{ts,tsx}\"",
+    "prepare": "husky"
   },
   "dependencies": {
     "@expo-google-fonts/inter": "^0.4.2",
@@ -48,11 +50,22 @@
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^8.59.3",
     "@typescript-eslint/parser": "^8.59.3",
+    "babel-plugin-module-resolver": "^5.0.3",
     "babel-preset-expo": "~54.0.10",
     "eslint": "^9.39.4",
+    "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-native": "^5.0.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.4",
+    "prettier": "^3.8.3",
     "react-native-svg-transformer": "^1.5.3"
+  },
+  "lint-staged": {
+    "src/**/*.{ts,tsx}": [
+      "prettier --write",
+      "eslint --fix"
+    ]
   }
 }

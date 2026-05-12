@@ -6,10 +6,10 @@ import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 
-import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { fetchActivityById, fetchActivities } from "../store/activitiesSlice";
-import { createExpense } from "../store/expensesSlice";
-import { Select, type SelectOption } from "./Select";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { fetchActivityById, fetchActivities } from "@/store/activitiesSlice";
+import { createExpense } from "@/store/expensesSlice";
+import { Select, type SelectOption } from "@/components/Select";
 
 cssInterop(MCI, {
   className: {
@@ -41,7 +41,12 @@ export function CreateExpenseModal({ visible, activityId, onClose }: CreateExpen
   const dispatch = useAppDispatch();
   const { current: activity } = useAppSelector((state) => state.activities);
   const { user } = useAppSelector((state) => state.auth);
-  const { control, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<FormData>({
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<FormData>({
     resolver: yupResolver(schema),
     defaultValues: {
       title: "",
@@ -67,14 +72,16 @@ export function CreateExpenseModal({ visible, activityId, onClose }: CreateExpen
     const participantIds = selectedParticipants.map((p) => p.id);
 
     try {
-      await dispatch(createExpense({
-        activityId,
-        data: {
-          title: data.title.trim(),
-          amountInCents,
-          participantsIds: participantIds,
-        },
-      })).unwrap();
+      await dispatch(
+        createExpense({
+          activityId,
+          data: {
+            title: data.title.trim(),
+            amountInCents,
+            participantsIds: participantIds,
+          },
+        }),
+      ).unwrap();
       dispatch(fetchActivityById(activityId));
       if (user?.id) dispatch(fetchActivities(user.id));
       onClose();
@@ -96,24 +103,11 @@ export function CreateExpenseModal({ visible, activityId, onClose }: CreateExpen
   }));
 
   return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="slide"
-      onRequestClose={handleClose}
-    >
-      <Pressable
-        className="flex-1 bg-black/60 justify-end"
-        onPress={handleClose}
-      >
-        <Pressable
-          className="w-full rounded-t-3xl bg-gray-700 px-6 pt-6 pb-8"
-          onPress={(e) => e.stopPropagation()}
-        >
+    <Modal visible={visible} transparent animationType="slide" onRequestClose={handleClose}>
+      <Pressable className="flex-1 bg-black/60 justify-end" onPress={handleClose}>
+        <Pressable className="w-full rounded-t-3xl bg-gray-700 px-6 pt-6 pb-8" onPress={(e) => e.stopPropagation()}>
           <View className="mb-6 flex-row items-center justify-between">
-            <Text className="font-heading-lg text-heading-lg text-gray-100">
-              Nova despesa
-            </Text>
+            <Text className="font-heading-lg text-heading-lg text-gray-100">Nova despesa</Text>
             <Pressable onPress={handleClose} className="p-1">
               <MCI name="close" size={24} className="color-gray-300" />
             </Pressable>
@@ -134,9 +128,7 @@ export function CreateExpenseModal({ visible, activityId, onClose }: CreateExpen
                       onChangeText={onChange}
                     />
                     {errors.title && (
-                      <Text className="mt-1 font-text-xs text-text-xs text-danger-light">
-                        {errors.title.message}
-                      </Text>
+                      <Text className="mt-1 font-text-xs text-text-xs text-danger-light">{errors.title.message}</Text>
                     )}
                   </>
                 )}
@@ -150,9 +142,7 @@ export function CreateExpenseModal({ visible, activityId, onClose }: CreateExpen
                 render={({ field: { onChange, value } }) => (
                   <>
                     <View className="flex-row items-center rounded-md border border-gray-500 bg-gray-800">
-                      <Text className="px-4 font-text-md text-text-md text-gray-400">
-                        R$
-                      </Text>
+                      <Text className="px-4 font-text-md text-text-md text-gray-400">R$</Text>
                       <TextInput
                         className="flex-1 h-12 font-text-md text-text-md text-gray-100"
                         placeholder="0,00"
@@ -163,9 +153,7 @@ export function CreateExpenseModal({ visible, activityId, onClose }: CreateExpen
                       />
                     </View>
                     {errors.amount && (
-                      <Text className="mt-1 font-text-xs text-text-xs text-danger-light">
-                        {errors.amount.message}
-                      </Text>
+                      <Text className="mt-1 font-text-xs text-text-xs text-danger-light">{errors.amount.message}</Text>
                     )}
                   </>
                 )}
@@ -190,9 +178,7 @@ export function CreateExpenseModal({ visible, activityId, onClose }: CreateExpen
             {isSubmitting ? (
               <ActivityIndicator color="#0B0B0E" />
             ) : (
-              <Text className="font-label-md text-label-md text-gray-800">
-                Salvar
-              </Text>
+              <Text className="font-label-md text-label-md text-gray-800">Salvar</Text>
             )}
           </Pressable>
         </Pressable>

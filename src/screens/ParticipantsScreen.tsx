@@ -4,10 +4,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Logo from "../../assets/logo.svg";
 import MCI from "@expo/vector-icons/MaterialCommunityIcons";
 import { cssInterop } from "nativewind";
-
-import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { fetchActivities } from "../store/activitiesSlice";
-import { fetchParticipants, removeParticipant } from "../store/participantsSlice";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { fetchActivities } from "@/store/activitiesSlice";
+import { fetchParticipants, removeParticipant } from "@/store/participantsSlice";
 
 cssInterop(MCI, {
   className: {
@@ -43,20 +42,16 @@ export default function ParticipantsScreen() {
   function handleRemoveParticipant(userId: string, userName: string) {
     if (!selectedActivityId) return;
 
-    Alert.alert(
-      "Remover participante",
-      `Tem certeza que deseja remover ${userName} desta atividade?`,
-      [
-        { text: "Cancelar", style: "cancel" },
-        {
-          text: "Remover",
-          style: "destructive",
-          onPress: () => {
-            dispatch(removeParticipant({ activityId: selectedActivityId, userId }));
-          },
+    Alert.alert("Remover participante", `Tem certeza que deseja remover ${userName} desta atividade?`, [
+      { text: "Cancelar", style: "cancel" },
+      {
+        text: "Remover",
+        style: "destructive",
+        onPress: () => {
+          dispatch(removeParticipant({ activityId: selectedActivityId, userId }));
         },
-      ]
-    );
+      },
+    ]);
   }
 
   if (loading) {
@@ -75,18 +70,12 @@ export default function ParticipantsScreen() {
           <Text className="font-heading-lg text-green-base ml-2">Cost</Text>
           <Text className="font-heading-sm text-green-light">Sharing</Text>
         </View>
-        <Text className="mt-1 font-heading-lg text-heading-lg text-gray-100">
-          Participantes
-        </Text>
-        <Text className="mt-1 font-text-sm text-text-sm text-gray-400">
-          Gerencie quem está nas suas atividades
-        </Text>
+        <Text className="mt-1 font-heading-lg text-heading-lg text-gray-100">Participantes</Text>
+        <Text className="mt-1 font-text-sm text-text-sm text-gray-400">Gerencie quem está nas suas atividades</Text>
       </View>
 
       <View className="px-6 mb-4">
-        <Text className="mb-2 font-label-sm text-label-sm text-gray-300">
-          Atividades
-        </Text>
+        <Text className="mb-2 font-label-sm text-label-sm text-gray-300">Atividades</Text>
         <FlatList
           horizontal
           data={activities}
@@ -96,9 +85,7 @@ export default function ParticipantsScreen() {
           renderItem={({ item }) => (
             <Pressable
               className={`rounded-full px-4 py-2 border ${
-                selectedActivityId === item.id
-                  ? "bg-green-base border-green-light"
-                  : "bg-gray-700 border-gray-500"
+                selectedActivityId === item.id ? "bg-green-base border-green-light" : "bg-gray-700 border-gray-500"
               }`}
               onPress={() => setSelectedActivityId(item.id)}
             >
@@ -117,9 +104,7 @@ export default function ParticipantsScreen() {
       {selectedActivityId ? (
         <>
           <View className="mt-2 px-6 mb-4 flex-row items-center justify-between">
-            <Text className="font-label-md text-label-md text-gray-300">
-              {activityName}
-            </Text>
+            <Text className="font-label-md text-label-md text-gray-300">{activityName}</Text>
             <Text className="font-text-sm text-text-sm text-gray-400">
               {participants.length} {participants.length === 1 ? "pessoa" : "pessoas"}
             </Text>
@@ -138,12 +123,8 @@ export default function ParticipantsScreen() {
                     </Text>
                   </View>
                   <View>
-                    <Text className="font-label-sm text-label-sm text-gray-100">
-                      {item.name}
-                    </Text>
-                    <Text className="font-text-xs text-text-xs text-gray-400">
-                      {item.email}
-                    </Text>
+                    <Text className="font-label-sm text-label-sm text-gray-100">{item.name}</Text>
+                    <Text className="font-text-xs text-text-xs text-gray-400">{item.email}</Text>
                   </View>
                 </View>
 

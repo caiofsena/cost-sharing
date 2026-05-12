@@ -5,7 +5,7 @@ import MCI from "@expo/vector-icons/MaterialCommunityIcons";
 import { cssInterop } from "nativewind";
 
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { activitiesService } from "../services";
+import { activitiesService } from "@/services";
 
 cssInterop(MCI, {
   className: {
@@ -17,7 +17,11 @@ type AuthStackParamList = {
   CreateActivity: undefined;
 };
 
-export default function CreateActivityScreen({ navigation }: { navigation: NativeStackNavigationProp<AuthStackParamList> }) {
+export default function CreateActivityScreen({
+  navigation,
+}: {
+  navigation: NativeStackNavigationProp<AuthStackParamList>;
+}) {
   const [title, setTitle] = useState("");
   const [activityDate, setActivityDate] = useState(new Date().toISOString().split("T")[0]);
   const [loading, setLoading] = useState(false);
@@ -53,26 +57,20 @@ export default function CreateActivityScreen({ navigation }: { navigation: Nativ
         <Pressable onPress={() => navigation.goBack()} className="p-1">
           <MCI name="arrow-left" size={24} className="color-gray-100" />
         </Pressable>
-        <Text className="flex-1 text-center font-heading-lg text-heading-lg text-gray-100">
-          Nova Atividade
-        </Text>
+        <Text className="flex-1 text-center font-heading-lg text-heading-lg text-gray-100">Nova Atividade</Text>
         <View className="w-8" />
       </View>
 
       <View className="flex-1 px-6 py-8">
         {error ? (
           <View className="mb-4 rounded-md bg-danger-low p-3">
-            <Text className="text-center font-text-sm text-text-sm text-danger-light">
-              {error}
-            </Text>
+            <Text className="text-center font-text-sm text-text-sm text-danger-light">{error}</Text>
           </View>
         ) : null}
 
         <View className="gap-6">
           <View>
-            <Text className="mb-2 font-label-sm text-label-sm text-gray-300">
-              Nome da atividade
-            </Text>
+            <Text className="mb-2 font-label-sm text-label-sm text-gray-300">Nome da atividade</Text>
             <TextInput
               className="h-12 rounded-md border border-gray-500 bg-gray-700 px-4 font-text-md text-text-md text-gray-100"
               placeholder="Ex: Férias de verão"
@@ -83,9 +81,7 @@ export default function CreateActivityScreen({ navigation }: { navigation: Nativ
           </View>
 
           <View>
-            <Text className="mb-2 font-label-sm text-label-sm text-gray-300">
-              Data
-            </Text>
+            <Text className="mb-2 font-label-sm text-label-sm text-gray-300">Data</Text>
             <TextInput
               className="h-12 rounded-md border border-gray-500 bg-gray-700 px-4 font-text-md text-text-md text-gray-100"
               placeholder="AAAA-MM-DD"
@@ -104,9 +100,7 @@ export default function CreateActivityScreen({ navigation }: { navigation: Nativ
           {loading ? (
             <ActivityIndicator color="#0B0B0E" />
           ) : (
-            <Text className="font-label-md text-label-md text-gray-800">
-              Criar atividade
-            </Text>
+            <Text className="font-label-md text-label-md text-gray-800">Criar atividade</Text>
           )}
         </Pressable>
       </View>

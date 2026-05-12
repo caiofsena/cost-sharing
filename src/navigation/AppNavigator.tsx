@@ -3,18 +3,18 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
 
-import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { checkStoredAuth } from "../store/authSlice";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { checkStoredAuth } from "@/store/authSlice";
 import MCI from "@expo/vector-icons/MaterialCommunityIcons";
 import { cssInterop } from "nativewind";
 
-import LoginScreen from "../screens/LoginScreen";
-import SignupScreen from "../screens/SignupScreen";
-import HomeScreen from "../screens/HomeScreen";
-import ActivitiesScreen from '../screens/ActivitiesScreen';
-import ExpensesScreen from '../screens/ExpensesScreen';
-import ResumeScreen from '../screens/ResumeScreen';
-import ParticipantsScreen from '../screens/ParticipantsScreen';
+import LoginScreen from "@/screens/LoginScreen";
+import SignupScreen from "@/screens/SignupScreen";
+import HomeScreen from "@/screens/HomeScreen";
+import ActivitiesScreen from "@/screens/ActivitiesScreen";
+import ExpensesScreen from "@/screens/ExpensesScreen";
+import ResumeScreen from "@/screens/ResumeScreen";
+import ParticipantsScreen from "@/screens/ParticipantsScreen";
 
 cssInterop(MCI, {
   className: {

@@ -4,8 +4,7 @@ import { tv } from "tailwind-variants";
 
 const input = tv({
   slots: {
-    field:
-      "h-12 rounded-md border border-gray-500 bg-gray-700 px-4 font-text-md text-text-md text-gray-100",
+    field: "h-12 rounded-md border border-gray-500 bg-gray-700 px-4 font-text-md text-text-md text-gray-100",
     list: "overflow-hidden rounded-lg border border-gray-500 bg-gray-700 p-4",
     option: "flex-row items-center gap-3 py-2",
     avatar: "h-8 w-8 items-center justify-center rounded-full bg-gray-600",

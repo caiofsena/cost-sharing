@@ -3,12 +3,19 @@ import { ActivityIndicator, FlatList, Pressable, Text, View } from "react-native
 import { SafeAreaView } from "react-native-safe-area-context";
 import MCI from "@expo/vector-icons/MaterialCommunityIcons";
 
-import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { fetchActivityById, clearCurrent, fetchActivities } from "../store/activitiesSlice";
-import { fetchExpenseById, clearCurrent as clearExpenseCurrent } from "../store/expensesSlice";
-import { Button, ExpenseCard, CreateExpenseModal, EditActivityModal, EditExpenseModal, EditExpenseFormModal } from "../components";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { fetchActivityById, clearCurrent, fetchActivities } from "@/store/activitiesSlice";
+import { fetchExpenseById, clearCurrent as clearExpenseCurrent } from "@/store/expensesSlice";
+import {
+  Button,
+  ExpenseCard,
+  CreateExpenseModal,
+  EditActivityModal,
+  EditExpenseModal,
+  EditExpenseFormModal,
+} from "@/components";
+import type { ActivityDetailResponseExpenseInfo, ExpenseDetailResponse } from "@/services/types";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import type { ActivityDetailResponseExpenseInfo, ExpenseDetailResponse } from "../services/types";
 
 type ExpensesStackParamList = {
   Expenses: { activityId: string };
@@ -29,9 +36,7 @@ function getInitials(name: string): string {
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
 
-function computeExpenseStatus(
-  participants: { paymentStatus: string }[]
-): "paid" | "partial" | "pending" {
+function computeExpenseStatus(participants: { paymentStatus: string }[]): "paid" | "partial" | "pending" {
   if (participants.length === 0) return "pending";
   const allPaid = participants.every((p) => p.paymentStatus === "paid");
   const anyPaid = participants.some((p) => p.paymentStatus === "paid");
@@ -63,12 +68,13 @@ function ExpenseItem({ item, onPress }: { item: ActivityDetailResponseExpenseInf
   });
 
   const participantsCount = item.participants.length;
-  const perPerson = participantsCount > 0
-    ? (item.amountInCents / 100 / participantsCount).toLocaleString("pt-BR", {
-        style: "currency",
-        currency: "BRL",
-      })
-    : totalAmount;
+  const perPerson =
+    participantsCount > 0
+      ? (item.amountInCents / 100 / participantsCount).toLocaleString("pt-BR", {
+          style: "currency",
+          currency: "BRL",
+        })
+      : totalAmount;
 
   const initials = item.participants.map((p) => getInitials(p.name));
   const status = computeExpenseStatus(item.participants);
@@ -160,22 +166,15 @@ export default function ExpensesScreen({ route, navigation }: ExpensesScreenProp
     currency: "BRL",
   });
 
-  const activityDate = activity?.activityDate
-    ? new Date(activity.activityDate).toLocaleDateString("pt-BR")
-    : "";
+  const activityDate = activity?.activityDate ? new Date(activity.activityDate).toLocaleDateString("pt-BR") : "";
 
   return (
     <SafeAreaView className="flex-1 bg-gray-800">
       <View className="px-6 py-4">
         <View className="flex-row items-center justify-between">
-          <Pressable
-            className="flex-row items-center gap-1"
-            onPress={() => navigation.goBack()}
-          >
+          <Pressable className="flex-row items-center gap-1" onPress={() => navigation.goBack()}>
             <MCI name="arrow-left" size={20} className="color-green-light" />
-            <Text className="font-label-sm text-label-sm text-green-light">
-              Voltar
-            </Text>
+            <Text className="font-label-sm text-label-sm text-green-light">Voltar</Text>
           </Pressable>
 
           <Pressable
@@ -186,14 +185,10 @@ export default function ExpensesScreen({ route, navigation }: ExpensesScreenProp
           </Pressable>
         </View>
 
-        <Text className="mt-4 font-heading-lg text-heading-lg text-gray-100">
-          {activity?.name}
-        </Text>
+        <Text className="mt-4 font-heading-lg text-heading-lg text-gray-100">{activity?.name}</Text>
         <View className="mt-1 flex-row items-center gap-1">
           <MCI name="calendar-outline" size={16} className="color-gray-400" />
-          <Text className="font-text-sm text-text-sm text-gray-400">
-            {activityDate}
-          </Text>
+          <Text className="font-text-sm text-text-sm text-gray-400">{activityDate}</Text>
         </View>
       </View>
 
@@ -209,9 +204,7 @@ export default function ExpensesScreen({ route, navigation }: ExpensesScreenProp
                     key={p.id}
                     className={`h-8 w-8 items-center justify-center rounded-full bg-gray-600 ${i > 0 ? "-ml-2" : ""}`}
                   >
-                    <Text className="text-[10px] font-label-sm text-gray-100">
-                      {getInitials(p.name)}
-                    </Text>
+                    <Text className="text-[10px] font-label-sm text-gray-100">{getInitials(p.name)}</Text>
                   </View>
                 ))}
               </View>
@@ -221,19 +214,13 @@ export default function ExpensesScreen({ route, navigation }: ExpensesScreenProp
             </View>
 
             <View className="items-end">
-              <Text className="font-label-md text-label-md text-green-light">
-                {totalFormatted}
-              </Text>
-              <Text className="font-text-xs text-text-xs text-gray-400">
-                Gastos totais
-              </Text>
+              <Text className="font-label-md text-label-md text-green-light">{totalFormatted}</Text>
+              <Text className="font-text-xs text-text-xs text-gray-400">Gastos totais</Text>
             </View>
           </View>
 
           <View className="flex-row items-center justify-between px-6 py-3">
-            <Text className="font-label-sm text-label-sm text-gray-200">
-              Despesas
-            </Text>
+            <Text className="font-label-sm text-label-sm text-gray-200">Despesas</Text>
             <Text className="font-text-sm text-text-sm text-gray-400">
               {expenses.length} {expenses.length === 1 ? "item" : "itens"}
             </Text>
@@ -242,24 +229,15 @@ export default function ExpensesScreen({ route, navigation }: ExpensesScreenProp
           <FlatList
             data={expenses}
             keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <ExpenseItem
-                item={item}
-                onPress={() => handleOpenExpense(item.id)}
-              />
-            )}
+            renderItem={({ item }) => <ExpenseItem item={item} onPress={() => handleOpenExpense(item.id)} />}
             contentContainerClassName="gap-4 px-6 py-4"
             showsVerticalScrollIndicator={false}
           />
         </>
       )}
 
-      { expenses.length > 0 && (
-        <Button
-          className="absolute bottom-6 right-6"
-          onPress={handleCreateExpense}
-          hasIconLeft
-        >
+      {expenses.length > 0 && (
+        <Button className="absolute bottom-6 right-6" onPress={handleCreateExpense} hasIconLeft>
           <Text className="font-label-sm text-label-sm text-gray-800">Nova</Text>
         </Button>
       )}

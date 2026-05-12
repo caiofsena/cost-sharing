@@ -1,15 +1,15 @@
-import api from './api';
+import api from "./api";
 import type {
   CreateActivityRequest,
   CreateActivityResponse,
   UpdateActivityRequest,
   ActivityListResponse,
   ActivityDetailResponse,
-} from './types';
+} from "./types";
 
 export const activitiesService = {
   async create(data: CreateActivityRequest): Promise<CreateActivityResponse> {
-    const response = await api.post<CreateActivityResponse>('/activities', data);
+    const response = await api.post<CreateActivityResponse>("/activities", data);
     return response.data;
   },
 

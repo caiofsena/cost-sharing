@@ -1,4 +1,4 @@
-import api from './api';
+import api from "./api";
 import type {
   CreateExpenseRequest,
   CreateExpenseResponse,
@@ -10,21 +10,16 @@ import type {
   MarkPaymentRequest,
   MarkPaymentResponse,
   ToggleParticipantPaymentResponse,
-} from './types';
+} from "./types";
 
 export const expensesService = {
   async create(activityId: string, data: CreateExpenseRequest): Promise<CreateExpenseResponse> {
-    const response = await api.post<CreateExpenseResponse>(
-      `/activities/${activityId}/expenses`,
-      data
-    );
+    const response = await api.post<CreateExpenseResponse>(`/activities/${activityId}/expenses`, data);
     return response.data;
   },
 
   async listByActivity(activityId: string): Promise<ExpenseListResponse> {
-    const response = await api.get<ExpenseListResponse>(
-      `/activities/${activityId}/expenses`
-    );
+    const response = await api.get<ExpenseListResponse>(`/activities/${activityId}/expenses`);
     return response.data;
   },
 
@@ -43,34 +38,19 @@ export const expensesService = {
     return response.data;
   },
 
-  async setPayer(
-    expenseId: string,
-    data: SetExpensePayerRequest
-  ): Promise<SetExpensePayerResponse> {
-    const response = await api.put<SetExpensePayerResponse>(
-      `/expenses/${expenseId}/payer`,
-      data
-    );
+  async setPayer(expenseId: string, data: SetExpensePayerRequest): Promise<SetExpensePayerResponse> {
+    const response = await api.put<SetExpensePayerResponse>(`/expenses/${expenseId}/payer`, data);
     return response.data;
   },
 
-  async markPayment(
-    expenseId: string,
-    data: MarkPaymentRequest
-  ): Promise<MarkPaymentResponse> {
-    const response = await api.post<MarkPaymentResponse>(
-      `/expenses/${expenseId}/payments`,
-      data
-    );
+  async markPayment(expenseId: string, data: MarkPaymentRequest): Promise<MarkPaymentResponse> {
+    const response = await api.post<MarkPaymentResponse>(`/expenses/${expenseId}/payments`, data);
     return response.data;
   },
 
-  async toggleParticipantPayment(
-    expenseId: string,
-    participantId: string
-  ): Promise<ToggleParticipantPaymentResponse> {
+  async toggleParticipantPayment(expenseId: string, participantId: string): Promise<ToggleParticipantPaymentResponse> {
     const response = await api.put<ToggleParticipantPaymentResponse>(
-      `/expenses/${expenseId}/participants/${participantId}/payment/toggle`
+      `/expenses/${expenseId}/participants/${participantId}/payment/toggle`,
     );
     return response.data;
   },

@@ -4,7 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import MCI from "@expo/vector-icons/MaterialCommunityIcons";
 
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { expensesService } from "../services";
+import { expensesService } from "@/services";
 
 type ExpensesStackParamList = {
   CreateExpense: { activityId: string };
@@ -63,26 +63,20 @@ export default function CreateExpenseScreen({ route, navigation }: CreateExpense
         <Pressable onPress={() => navigation.goBack()} className="p-1">
           <MCI name="arrow-left" size={24} className="color-gray-100" />
         </Pressable>
-        <Text className="flex-1 text-center font-heading-lg text-heading-lg text-gray-100">
-          Nova Despesa
-        </Text>
+        <Text className="flex-1 text-center font-heading-lg text-heading-lg text-gray-100">Nova Despesa</Text>
         <View className="w-8" />
       </View>
 
       <View className="flex-1 px-6 py-8">
         {error ? (
           <View className="mb-4 rounded-md bg-danger-low p-3">
-            <Text className="text-center font-text-sm text-text-sm text-danger-light">
-              {error}
-            </Text>
+            <Text className="text-center font-text-sm text-text-sm text-danger-light">{error}</Text>
           </View>
         ) : null}
 
         <View className="gap-6">
           <View>
-            <Text className="mb-2 font-label-sm text-label-sm text-gray-300">
-              Nome da despesa
-            </Text>
+            <Text className="mb-2 font-label-sm text-label-sm text-gray-300">Nome da despesa</Text>
             <TextInput
               className="h-12 rounded-md border border-gray-500 bg-gray-700 px-4 font-text-md text-text-md text-gray-100"
               placeholder="Ex: Aluguel"
@@ -93,9 +87,7 @@ export default function CreateExpenseScreen({ route, navigation }: CreateExpense
           </View>
 
           <View>
-            <Text className="mb-2 font-label-sm text-label-sm text-gray-300">
-              Valor total
-            </Text>
+            <Text className="mb-2 font-label-sm text-label-sm text-gray-300">Valor total</Text>
             <TextInput
               className="h-12 rounded-md border border-gray-500 bg-gray-700 px-4 font-text-md text-text-md text-gray-100"
               placeholder="R$ 0,00"
@@ -115,9 +107,7 @@ export default function CreateExpenseScreen({ route, navigation }: CreateExpense
           {loading ? (
             <ActivityIndicator color="#0B0B0E" />
           ) : (
-            <Text className="font-label-md text-label-md text-gray-800">
-              Criar despesa
-            </Text>
+            <Text className="font-label-md text-label-md text-gray-800">Criar despesa</Text>
           )}
         </Pressable>
       </View>

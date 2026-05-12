@@ -1,11 +1,11 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { expensesService } from "../services";
+import { expensesService } from "@/services";
 import type {
   ExpenseListItem,
   ExpenseDetailResponse,
   CreateExpenseRequest,
   UpdateExpenseRequest,
-} from "../services/types";
+} from "@/services/types";
 
 interface ExpensesState {
   items: ExpenseListItem[];
@@ -27,7 +27,14 @@ function extractErrorMessage(err: unknown, fallback: string): string {
   if (data && typeof data === "object" && "reason" in data) return (data as { reason: string }).reason;
   if (data && typeof data === "object" && "message" in data) return (data as { message: string }).message;
   if (data && typeof data === "object" && "error" in data) return (data as { error: string }).error;
-  if (data && typeof data === "object" && "errors" in data && Array.isArray((data as { errors: unknown }).errors) && (data as { errors: string[] }).errors.length > 0) return (data as { errors: string[] }).errors[0];
+  if (
+    data &&
+    typeof data === "object" &&
+    "errors" in data &&
+    Array.isArray((data as { errors: unknown }).errors) &&
+    (data as { errors: string[] }).errors.length > 0
+  )
+    return (data as { errors: string[] }).errors[0];
   if (err && typeof err === "object" && "message" in err) return (err as { message: string }).message;
   return fallback;
 }
@@ -41,7 +48,7 @@ export const fetchExpensesByActivity = createAsyncThunk(
     } catch (err: unknown) {
       return rejectWithValue(extractErrorMessage(err, "Erro ao buscar despesas"));
     }
-  }
+  },
 );
 
 export const fetchExpenseById = createAsyncThunk(
@@ -52,7 +59,7 @@ export const fetchExpenseById = createAsyncThunk(
     } catch (err: unknown) {
       return rejectWithValue(extractErrorMessage(err, "Erro ao buscar despesa"));
     }
-  }
+  },
 );
 
 export const createExpense = createAsyncThunk(
@@ -63,7 +70,7 @@ export const createExpense = createAsyncThunk(
     } catch (err: unknown) {
       return rejectWithValue(extractErrorMessage(err, "Erro ao criar despesa"));
     }
-  }
+  },
 );
 
 export const updateExpense = createAsyncThunk(
@@ -74,19 +81,16 @@ export const updateExpense = createAsyncThunk(
     } catch (err: unknown) {
       return rejectWithValue(extractErrorMessage(err, "Erro ao atualizar despesa"));
     }
-  }
+  },
 );
 
-export const deleteExpense = createAsyncThunk(
-  "expenses/delete",
-  async (expenseId: string, { rejectWithValue }) => {
-    try {
-      return await expensesService.delete(expenseId);
-    } catch (err: unknown) {
-      return rejectWithValue(extractErrorMessage(err, "Erro ao excluir despesa"));
-    }
+export const deleteExpense = createAsyncThunk("expenses/delete", async (expenseId: string, { rejectWithValue }) => {
+  try {
+    return await expensesService.delete(expenseId);
+  } catch (err: unknown) {
+    return rejectWithValue(extractErrorMessage(err, "Erro ao excluir despesa"));
   }
-);
+});
 
 export const toggleParticipantPayment = createAsyncThunk(
   "expenses/toggleParticipantPayment",
@@ -96,7 +100,7 @@ export const toggleParticipantPayment = createAsyncThunk(
     } catch (err: unknown) {
       return rejectWithValue(extractErrorMessage(err, "Erro ao alternar pagamento"));
     }
-  }
+  },
 );
 
 const expensesSlice = createSlice({

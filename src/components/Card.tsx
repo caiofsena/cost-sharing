@@ -30,14 +30,7 @@ type ActivityCardProps = {
   className?: string;
 };
 
-export function ActivityCard({
-  title,
-  amount,
-  date,
-  participants,
-  expenses,
-  className,
-}: ActivityCardProps) {
+export function ActivityCard({ title, amount, date, participants, expenses, className }: ActivityCardProps) {
   return (
     <Card className={`gap-4 ${className ?? ""}`}>
       <View className="flex-row items-center justify-between gap-4">
@@ -76,14 +69,7 @@ type ExpenseCardProps = {
   className?: string;
 };
 
-export function ExpenseCard({
-  title,
-  amount,
-  perPerson,
-  initials,
-  status = "pending",
-  className,
-}: ExpenseCardProps) {
+export function ExpenseCard({ title, amount, perPerson, initials, status = "pending", className }: ExpenseCardProps) {
   return (
     <Card className={`gap-7 ${className ?? ""}`}>
       <View className="flex-row justify-between gap-4">

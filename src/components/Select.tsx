@@ -14,8 +14,7 @@ const select = tv({
   slots: {
     trigger: "flex-row items-center justify-between h-12 rounded-md border px-4",
     triggerText: "font-text-md text-text-md",
-    dropdown:
-      "absolute bottom-full mb-2 w-full rounded-md border bg-gray-700 border-gray-500 overflow-hidden",
+    dropdown: "absolute bottom-full mb-2 w-full rounded-md border bg-gray-700 border-gray-500 overflow-hidden",
     item: "flex-row items-center gap-3 px-4 py-3",
     avatar: "h-8 w-8 items-center justify-center rounded-full bg-gray-600",
     avatarText: "font-text-xs text-text-xs text-gray-100",
@@ -55,13 +54,7 @@ type SelectProps = {
   error?: string;
 };
 
-export function Select({
-  options,
-  value,
-  onChange,
-  placeholder = "Selecionar",
-  error,
-}: SelectProps) {
+export function Select({ options, value, onChange, placeholder = "Selecionar", error }: SelectProps) {
   const [isOpen, setIsOpen] = useState(false);
   const styles = select({ isOpen, hasError: !!error });
 
@@ -71,9 +64,7 @@ export function Select({
 
   function handleSelect(option: SelectOption) {
     const exists = value.some((v) => v.id === option.id);
-    const newValue = exists
-      ? value.filter((v) => v.id !== option.id)
-      : [...value, option];
+    const newValue = exists ? value.filter((v) => v.id !== option.id) : [...value, option];
     onChange(newValue);
   }
 
@@ -87,20 +78,13 @@ export function Select({
   }
 
   const displayText =
-    value.length === 0
-      ? placeholder
-      : value.length === 1
-        ? value[0].name
-        : `${value.length} selecionados`;
+    value.length === 0 ? placeholder : value.length === 1 ? value[0].name : `${value.length} selecionados`;
 
   return (
     <View>
       {isOpen && (
         <>
-          <Pressable
-            className="absolute inset-0"
-            onPress={handleBackdropPress}
-          />
+          <Pressable className="absolute inset-0" onPress={handleBackdropPress} />
           <View className={styles.dropdown()}>
             {options.map((option) => {
               const isSelected = value.some((v) => v.id === option.id);
@@ -135,9 +119,7 @@ export function Select({
         className={styles.trigger()}
         onPress={handleToggle}
       >
-        <Text
-          className={`${styles.triggerText()} ${value.length > 0 ? "text-gray-100" : "text-gray-400"}`}
-        >
+        <Text className={`${styles.triggerText()} ${value.length > 0 ? "text-gray-100" : "text-gray-400"}`}>
           {displayText}
         </Text>
         <MCI name="chevron-down" size={20} className="color-gray-200" />
@@ -146,24 +128,14 @@ export function Select({
       {value.length > 0 && (
         <View className="mt-5 gap-3">
           {value.map((option) => (
-            <View
-              key={option.id}
-              className="flex-row items-center justify-between rounded-md px-4 py-3"
-            >
+            <View key={option.id} className="flex-row items-center justify-between rounded-md px-4 py-3">
               <View className="flex-row items-center gap-3">
                 <View className="h-8 w-8 items-center justify-center rounded-full bg-gray-600">
-                  <Text className="font-text-xs text-text-xs text-gray-100">
-                    {option.initials}
-                  </Text>
+                  <Text className="font-text-xs text-text-xs text-gray-100">{option.initials}</Text>
                 </View>
-                <Text className="font-label-sm text-label-sm text-gray-100">
-                  {option.name}
-                </Text>
+                <Text className="font-label-sm text-label-sm text-gray-100">{option.name}</Text>
               </View>
-              <Pressable
-                className="p-1"
-                onPress={() => handleRemove(option)}
-              >
+              <Pressable className="p-1" onPress={() => handleRemove(option)}>
                 <MCI name="delete-outline" size={18} className="color-danger-light" />
               </Pressable>
             </View>
@@ -172,8 +144,6 @@ export function Select({
       )}
 
       {error ? <Text className={styles.errorText()}>{error}</Text> : null}
-
-
     </View>
   );
 }

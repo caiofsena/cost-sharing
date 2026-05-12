@@ -3,12 +3,12 @@ import { ActivityIndicator, Alert, Modal, Pressable, Text, View } from "react-na
 import MCI from "@expo/vector-icons/MaterialCommunityIcons";
 import { cssInterop } from "nativewind";
 
-import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { fetchActivityById, fetchActivities } from "../store/activitiesSlice";
-import { deleteExpense, toggleParticipantPayment } from "../store/expensesSlice";
-import { StatusSelect } from "./StatusSelect";
-import type { ExpenseDetailResponse } from "../services/types";
-import { Button } from './Button';
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { fetchActivityById, fetchActivities } from "@/store/activitiesSlice";
+import { deleteExpense, toggleParticipantPayment } from "@/store/expensesSlice";
+import { StatusSelect } from "@/components/StatusSelect";
+import type { ExpenseDetailResponse } from "@/services/types";
+import { Button } from "@/components/Button";
 
 cssInterop(MCI, {
   className: {
@@ -53,11 +53,7 @@ export function EditExpenseModal({
   const allPaid = expense.participants.every((p) => p.paymentStatus === "paid");
   const anyPaid = expense.participants.some((p) => p.paymentStatus === "paid");
   const statusLabel = allPaid ? "Pago" : anyPaid ? "Parcial" : "Pendente";
-  const statusColor = allPaid
-    ? "text-green-base"
-    : anyPaid
-      ? "text-alert-base"
-      : "text-danger-light";
+  const statusColor = allPaid ? "text-green-base" : anyPaid ? "text-alert-base" : "text-danger-light";
 
   async function handleTogglePayment(participantId: string) {
     setToggling(participantId);
@@ -74,27 +70,23 @@ export function EditExpenseModal({
   }
 
   function handleDelete() {
-    Alert.alert(
-      "Excluir despesa",
-      "Tem certeza que deseja excluir esta despesa? Esta ação não pode ser desfeita.",
-      [
-        { text: "Cancelar", style: "cancel" },
-        {
-          text: "Excluir",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              await dispatch(deleteExpense(expense.id)).unwrap();
-              dispatch(fetchActivityById(activityId));
-              if (user?.id) dispatch(fetchActivities(user.id));
-              onClose();
-            } catch (err) {
-              console.error("Failed to delete expense:", err);
-            }
-          },
+    Alert.alert("Excluir despesa", "Tem certeza que deseja excluir esta despesa? Esta ação não pode ser desfeita.", [
+      { text: "Cancelar", style: "cancel" },
+      {
+        text: "Excluir",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            await dispatch(deleteExpense(expense.id)).unwrap();
+            dispatch(fetchActivityById(activityId));
+            if (user?.id) dispatch(fetchActivities(user.id));
+            onClose();
+          } catch (err) {
+            console.error("Failed to delete expense:", err);
+          }
         },
-      ]
-    );
+      },
+    ]);
   }
 
   function handleClose() {
@@ -102,28 +94,13 @@ export function EditExpenseModal({
   }
 
   return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="slide"
-      onRequestClose={handleClose}
-    >
-      <Pressable
-        className="flex-1 bg-black/60 justify-end"
-        onPress={handleClose}
-      >
-        <Pressable
-          className="w-full rounded-t-3xl bg-gray-700 px-6 pt-6 pb-8"
-          onPress={(e) => e.stopPropagation()}
-        >
+    <Modal visible={visible} transparent animationType="slide" onRequestClose={handleClose}>
+      <Pressable className="flex-1 bg-black/60 justify-end" onPress={handleClose}>
+        <Pressable className="w-full rounded-t-3xl bg-gray-700 px-6 pt-6 pb-8" onPress={(e) => e.stopPropagation()}>
           <View className="mb-6 flex-row items-start justify-between">
             <View className="flex-1 pr-4">
-              <Text className="font-heading-lg text-heading-lg text-gray-100">
-                {expense.name}
-              </Text>
-              <Text className="mt-1 font-heading-md text-heading-md text-green-base">
-                {totalFormatted}
-              </Text>
+              <Text className="font-heading-lg text-heading-lg text-gray-100">{expense.name}</Text>
+              <Text className="mt-1 font-heading-md text-heading-md text-green-base">{totalFormatted}</Text>
             </View>
             <Pressable onPress={handleClose} className="p-1">
               <MCI name="close" size={24} className="color-gray-300" />
@@ -135,9 +112,7 @@ export function EditExpenseModal({
               {participantsCount} {participantsCount === 1 ? "participante" : "participantes"}
             </Text>
             <View className="rounded-md bg-alert-low px-3 py-1">
-              <Text className={`font-label-xs text-label-xs ${statusColor}`}>
-                {statusLabel}
-              </Text>
+              <Text className={`font-label-xs text-label-xs ${statusColor}`}>{statusLabel}</Text>
             </View>
           </View>
 
@@ -157,27 +132,18 @@ export function EditExpenseModal({
                 >
                   <View className="flex-row items-center gap-3">
                     <View className="h-10 w-10 items-center justify-center rounded-full bg-gray-600">
-                      <Text className="font-label-sm text-label-sm text-gray-100">
-                        {getInitials(p.name)}
-                      </Text>
+                      <Text className="font-label-sm text-label-sm text-gray-100">{getInitials(p.name)}</Text>
                     </View>
                     <View>
-                      <Text className="font-label-sm text-label-sm text-gray-100">
-                        {p.name}
-                      </Text>
-                      <Text className="font-text-xs text-text-xs text-gray-400">
-                        {individualAmount}
-                      </Text>
+                      <Text className="font-label-sm text-label-sm text-gray-100">{p.name}</Text>
+                      <Text className="font-text-xs text-text-xs text-gray-400">{individualAmount}</Text>
                     </View>
                   </View>
 
                   {isToggling ? (
                     <ActivityIndicator size="small" color="#585860" />
                   ) : (
-                    <StatusSelect
-                      value={paymentStatus}
-                      onChange={() => handleTogglePayment(p.userId)}
-                    />
+                    <StatusSelect value={paymentStatus} onChange={() => handleTogglePayment(p.userId)} />
                   )}
                 </View>
               );
@@ -192,14 +158,9 @@ export function EditExpenseModal({
               <MCI name="delete-outline" size={24} className="color-danger-light" />
             </Pressable>
 
-            <Button
-              intent='secondary'
-              onPress={onEdit}
-            >
+            <Button intent="secondary" onPress={onEdit}>
               <MCI name="pencil-outline" size={24} className="color-gray-200" />
-              <Text className="font-label-md text-label-md text-gray-200">
-                Editar
-              </Text>
+              <Text className="font-label-md text-label-md text-gray-200">Editar</Text>
             </Button>
           </View>
         </Pressable>

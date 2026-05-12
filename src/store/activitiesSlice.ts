@@ -1,11 +1,11 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { activitiesService } from "../services";
+import { activitiesService } from "@/services";
 import type {
   ActivityListItem,
   ActivityDetailResponse,
   CreateActivityRequest,
   UpdateActivityRequest,
-} from "../services/types";
+} from "@/services/types";
 
 interface ActivitiesState {
   items: ActivityListItem[];
@@ -27,22 +27,26 @@ function extractErrorMessage(err: unknown, fallback: string): string {
   if (data && typeof data === "object" && "reason" in data) return (data as { reason: string }).reason;
   if (data && typeof data === "object" && "message" in data) return (data as { message: string }).message;
   if (data && typeof data === "object" && "error" in data) return (data as { error: string }).error;
-  if (data && typeof data === "object" && "errors" in data && Array.isArray((data as { errors: unknown }).errors) && (data as { errors: string[] }).errors.length > 0) return (data as { errors: string[] }).errors[0];
+  if (
+    data &&
+    typeof data === "object" &&
+    "errors" in data &&
+    Array.isArray((data as { errors: unknown }).errors) &&
+    (data as { errors: string[] }).errors.length > 0
+  )
+    return (data as { errors: string[] }).errors[0];
   if (err && typeof err === "object" && "message" in err) return (err as { message: string }).message;
   return fallback;
 }
 
-export const fetchActivities = createAsyncThunk(
-  "activities/fetchAll",
-  async (userId: string, { rejectWithValue }) => {
-    try {
-      const response = await activitiesService.listByUser(userId);
-      return response.activities;
-    } catch (err: unknown) {
-      return rejectWithValue(extractErrorMessage(err, "Erro ao buscar atividades"));
-    }
+export const fetchActivities = createAsyncThunk("activities/fetchAll", async (userId: string, { rejectWithValue }) => {
+  try {
+    const response = await activitiesService.listByUser(userId);
+    return response.activities;
+  } catch (err: unknown) {
+    return rejectWithValue(extractErrorMessage(err, "Erro ao buscar atividades"));
   }
-);
+});
 
 export const fetchActivityById = createAsyncThunk(
   "activities/fetchById",
@@ -52,7 +56,7 @@ export const fetchActivityById = createAsyncThunk(
     } catch (err: unknown) {
       return rejectWithValue(extractErrorMessage(err, "Erro ao buscar atividade"));
     }
-  }
+  },
 );
 
 export const createActivity = createAsyncThunk(
@@ -63,7 +67,7 @@ export const createActivity = createAsyncThunk(
     } catch (err: unknown) {
       return rejectWithValue(extractErrorMessage(err, "Erro ao criar atividade"));
     }
-  }
+  },
 );
 
 export const updateActivity = createAsyncThunk(
@@ -74,19 +78,16 @@ export const updateActivity = createAsyncThunk(
     } catch (err: unknown) {
       return rejectWithValue(extractErrorMessage(err, "Erro ao atualizar atividade"));
     }
-  }
+  },
 );
 
-export const deleteActivity = createAsyncThunk(
-  "activities/delete",
-  async (activityId: string, { rejectWithValue }) => {
-    try {
-      return await activitiesService.delete(activityId);
-    } catch (err: unknown) {
-      return rejectWithValue(extractErrorMessage(err, "Erro ao excluir atividade"));
-    }
+export const deleteActivity = createAsyncThunk("activities/delete", async (activityId: string, { rejectWithValue }) => {
+  try {
+    return await activitiesService.delete(activityId);
+  } catch (err: unknown) {
+    return rejectWithValue(extractErrorMessage(err, "Erro ao excluir atividade"));
   }
-);
+});
 
 const activitiesSlice = createSlice({
   name: "activities",

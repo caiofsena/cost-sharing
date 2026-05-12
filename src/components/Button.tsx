@@ -69,9 +69,7 @@ export function Button({
       {...props}
     >
       {hasIconLeft && <MCI name="plus" size={24} />}
-      <>
-        {children}
-      </>
+      <>{children}</>
     </Pressable>
   );
 }

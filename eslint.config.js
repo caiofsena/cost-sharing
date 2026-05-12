@@ -4,9 +4,11 @@ import tsPlugin from "@typescript-eslint/eslint-plugin";
 import reactPlugin from "eslint-plugin-react";
 import reactHooksPlugin from "eslint-plugin-react-hooks";
 import reactNativePlugin from "eslint-plugin-react-native";
+import prettierConfig from "eslint-config-prettier";
 
 export default [
   js.configs.recommended,
+  prettierConfig,
   {
     files: ["**/*.{ts,tsx}"],
     languageOptions: {
